@@ -23,22 +23,5 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error: AxiosError) => {
-    // Handle 401 Unauthorized - token expired or invalid
-    const isVerifyRequest = error.config?.url?.includes('/auth/verify');
-    
-    if (error.response?.status === 401 && !isVerifyRequest) {
-      // Clear token and redirect to login
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    
-    // You can add more global error handling here
-    return Promise.reject(error);
-  }
-);
 
 export default api;

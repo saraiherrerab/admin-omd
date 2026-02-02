@@ -47,7 +47,7 @@ export default function Login() {
     setAuthError('')
     try {
       await login(data.email, data.password)
-      navigate('/')
+      navigate('/dashboard')
     } catch (err: any) {
       console.error(err)
       setAuthError(err.message || 'Invalid email or password')
@@ -59,7 +59,7 @@ export default function Login() {
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <LanguageSwitcher />
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
@@ -72,7 +72,7 @@ export default function Login() {
         </div>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
@@ -121,7 +121,7 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff   size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </Button>
               </div>
               {errors.password && (
@@ -137,9 +137,9 @@ export default function Login() {
 
             {authError && <p className="text-sm text-destructive">{authError}</p>}
 
-            <Button 
-              type="submit" 
-              variant="primary" 
+            <Button
+              type="submit"
+              variant="primary"
               size="lg"
               className="w-full font-semibold"
               disabled={isLoading}

@@ -39,40 +39,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.error('Invalid or expired token, attempting refresh:', error);
           localStorage.removeItem('token');
           setToken(null);
-          // Try to verify session via cookie even if local token failed
-          await checkSession();
         }
-      } else {
-        // No local token, check if we have a valid session cookie
-        await checkSession();
       }
-
       setLoading(false);
     };
 
-    const checkSession = async () => {
-      try {
-        const response = await authService.verifyToken();
 
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-          setToken(response.token);
-        }
-
-        if (response.user) {
-          setUser({
-            id: Number(response.user.id),
-            email: response.user.email,
-            username: response.user.email, // Fallback
-            name: response.user.name || '',
-            role: response.user.role || 'user',
-          });
-        }
-      } catch (error) {
-        // Silent fail, user is just not logged in
-        setUser(null);
-      }
-    };
 
     initAuth();
   }, []);
@@ -124,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (email: string, password: string, name: string) => {
     try {
       const response = await authService.register({
-        username: email, // Your API uses "username"
+        username: email,
         password,
         name,
         email,
@@ -177,25 +149,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+
   /**
-   * Refresh user data from the server
+   * Refresh user session and token
    */
   const refreshUser = async () => {
     try {
-      const response = await authService.verifyToken();
-      if (response.user) {
+      const response = await authService.refreshToken();
+
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        setToken(response.token);
+
+        const decoded = jwtDecode<JWTPayload>(response.token);
+        setUser({
+          id: decoded.id,
+          email: decoded.email,
+          name: decoded.name,
+          role: decoded.role,
+          username: decoded.username || decoded.email,
+        });
+      } else if (response.user) {
         setUser({
           id: Number(response.user.id),
           email: response.user.email,
-          username: response.user.email, // Fallback
+          username: response.user.email,
           name: response.user.name || '',
           role: response.user.role || 'user',
         });
       }
     } catch (error) {
-      console.error('Failed to refresh user:', error);
-      // If verification fails, logout the user
-      await logout();
+      console.error('Failed to refresh session:', error);
+      // If refresh fails (e.g. 401), we might want to let the user stay until they do something that requires auth
+      // or we could logout. For strict security, one might logout here.
+      // But let's avoid auto-logout for now to prevent UX loops.
     }
   };
 

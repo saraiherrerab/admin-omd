@@ -76,14 +76,7 @@ class AuthService {
     }
   }
 
-  /**
-   * Verify token validity
-   * @returns User data if token is valid
-   */
-  async verifyToken(): Promise<LoginResponse> {
-    const response = await api.get<LoginResponse>('/auth/verify');
-    return response.data;
-  }
+
 
   /**
    * Refresh token
