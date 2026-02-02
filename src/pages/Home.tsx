@@ -1,60 +1,42 @@
-import { useAuth } from '@/context/AuthContext'
-import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { LayoutDashboard, Settings, Users } from 'lucide-react'
+import { Layout } from '@/components/Layout'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function Home() {
-  const { user, logout } = useAuth()
-
+  const { t } = useLanguage()
   return (
-    <div className="min-h-screen bg-gray-50/50 p-8 dark:bg-gray-900">
-      <div className="mx-auto max-w-6xl space-y-8">
-        <header className="flex items-center justify-between rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-primary/10 p-3 text-primary">
-              <LayoutDashboard size={24} />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">Welcome back, {user?.email}</p>
-            </div>
-          </div>
-          <Button onClick={logout} variant="outline">Sign out</Button>
-        </header>
-
-        <main className="grid gap-6 md:grid-cols-3">
+      <Layout>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('home.totalUsers')}</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">1,234</div>
-              <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+              <p className="text-xs text-muted-foreground">{t('home.userGrowth')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('home.activeSessions')}</CardTitle>
               <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">+573</div>
-              <p className="text-xs text-muted-foreground">+201 since last hour</p>
+              <p className="text-xs text-muted-foreground">{t('home.sessionGrowth')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Settings</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('home.settings')}</CardTitle>
               <Settings className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Config</div>
-              <p className="text-xs text-muted-foreground">System functioning normal</p>
+              <div className="text-2xl font-bold">{t('home.config')}</div>
+              <p className="text-xs text-muted-foreground">{t('home.systemStatus')}</p>
             </CardContent>
           </Card>
-        </main>
-      </div>
-    </div>
+      </Layout>
   )
 }

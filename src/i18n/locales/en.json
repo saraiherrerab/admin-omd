@@ -1,0 +1,59 @@
+{
+  "common": {
+    "appName": "One Million Dollar Admin",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "logout": "Logout",
+    "menu": "Menu",
+    "language": "Language"
+  },
+  "auth": {
+    "login": "Log In",
+    "register": "Sign Up",
+    "signUp": "Registro",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginWithGoogle": "Log in with Google",
+    "loginWithApple": "Log in with Apple",
+    "signUpWithGoogle": "Sign up with Google",
+    "signUpWithApple": "Sign up with Apple",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Enter your password",
+    "namePlaceholder": "Enter your name",
+    "loginTitle": "Welcome Back",
+    "loginSubtitle": "Log in to your account",
+    "registerTitle": "Create Account",
+    "registerSubtitle": "Sign up to get started"
+  },
+  "home": {
+    "welcome": "Welcome back",
+    "dashboard": "Dashboard",
+    "totalUsers": "Total Users",
+    "activeSessions": "Active Sessions",
+    "settings": "Settings",
+    "config": "Config",
+    "userGrowth": "+20.1% from last month",
+    "sessionGrowth": "+201 since last hour",
+    "systemStatus": "System functioning normal"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match"
+  }
+}

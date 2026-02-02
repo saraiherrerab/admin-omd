@@ -1,0 +1,59 @@
+{
+  "common": {
+    "appName": "Administrador One Million Dollar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "logout": "Cerrar sesión",
+    "menu": "Menú",
+    "language": "Idioma"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "signUp": "Registro",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "name": "Nombre",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes una cuenta?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "loginWithGoogle": "Iniciar sesión con Google",
+    "loginWithApple": "Iniciar sesión con Apple",
+    "signUpWithGoogle": "Registrarse con Google",
+    "signUpWithApple": "Registrarse con Apple",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "namePlaceholder": "Ingresa tu nombre",
+    "loginTitle": "Bienvenido de nuevo",
+    "loginSubtitle": "Inicia sesión en tu cuenta",
+    "registerTitle": "Crear Cuenta",
+    "registerSubtitle": "Regístrate para comenzar"
+  },
+  "home": {
+    "welcome": "Bienvenido de nuevo",
+    "dashboard": "Panel de control",
+    "totalUsers": "Total de Usuarios",
+    "activeSessions": "Sesiones Activas",
+    "settings": "Configuración",
+    "config": "Configuración",
+    "userGrowth": "+20.1% del mes pasado",
+    "sessionGrowth": "+201 desde la última hora",
+    "systemStatus": "Sistema funcionando normalmente"
+  },
+  "validation": {
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "Por favor ingresa un correo válido",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden"
+  }
+}

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import './index.css'
 import App from './App.tsx'
+import './i18n/config' // Initialize i18n
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
