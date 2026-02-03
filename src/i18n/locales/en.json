@@ -109,7 +109,16 @@
       "created": "Created",
       "manage_permissions": "Manage Permissions",
       "actions":"Actions",
-      "state":"State"
+      "state":"State",
+      "edit":"Edit",
+      "delete":"Delete",
+      "create":"Create",
+      "search":"Search",
+      "filter":"Filter",
+      "logout":"Logout",
+      "menu":"Menu",
+      "language":"Language",
+      "view":"View"
     },
     "roleManagement": "Role Management",
     "rolesList": "List of all available roles in the system",

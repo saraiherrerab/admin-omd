@@ -1,7 +1,7 @@
 import { type ComponentProps, forwardRef } from "react"
 import { cn } from "@/lib/utils"
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "orange" | "orange-outline"
+type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "orange" | "orange-outline" | "destructive"
 type ButtonSize = "sm" | "md" | "lg"
 
 const Button = forwardRef<HTMLButtonElement, ComponentProps<"button"> & { variant?: ButtonVariant; size?: ButtonSize }>(
@@ -17,6 +17,7 @@ const Button = forwardRef<HTMLButtonElement, ComponentProps<"button"> & { varian
             "border border-input bg-background hover:bg-accent hover:text-accent-foreground": variant === "outline",
             "hover:bg-accent hover:text-accent-foreground": variant === "ghost",
             "border-2 border-primary text-primary bg-background hover:bg-primary/5": variant === "orange-outline",
+            "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow": variant === "destructive",
             "h-8 px-3 text-xs": size === "sm",
             "h-9 px-4 py-2": size === "md",
             "h-11 px-6": size === "lg",

@@ -13,7 +13,7 @@ export const Header = ({
     const { t } = useLanguage()
 
     return (
-        <header className="flex items-center justify-between p-6 md:p-4 mb-6">
+        <header className="flex items-center justify-between p-6 md:p-2 mb-0">
             <div className="flex items-center gap-4">
 
                 <Button variant="outline" size="sm" className="h-9 w-9 p-0" onClick={onMenuClick}><Menu className="h-4 w-4" /></Button>

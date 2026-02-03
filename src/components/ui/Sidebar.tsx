@@ -69,11 +69,7 @@ export const Sidebar = ({
         },
         {
             title: 'sidebar.elementMiners',
-            icon: <Layers className="text-magenta-500" />, // Note: magenta-500 might not exist in default tailwind, using text-pink-500 or style={{ color: 'magenta' }} if prefered. Stick to standard classes if possible or direct color prop if icon supports it. Keeping consistent with previous generic color usage but mapping to classes. 
-            // Previous code used color="magenta", Lucide icons accept color prop. I'll stick to that strictly? 
-            // Actually, clearer to use `className`. But let's check previous usage. They used `color="magenta"`.
-            // I will use color prop where they did to preserve exact look, or render icon directly.
-            // Let's keep the object definition simple.
+            icon: <Layers className="text-magenta-500" />,
             path: '/elementMiners',
             children: []
         },
@@ -91,7 +87,6 @@ export const Sidebar = ({
         }
     ];
 
-    // Helper to render icon with specific colors if needed, manually recreating the previous props
     const renderIcon = (itemPath: string) => {
         switch (itemPath) {
             case '/poolUSDT': return <Database color="blue" />;
@@ -121,12 +116,20 @@ export const Sidebar = ({
 
             {/* Sidebar */}
             <aside
-                className={`fixed top-0 left-0 z-50 h-screen w-64 bg-card border-r border-border transition-transform duration-300 ease-in-out shadow-lg flex flex-col ${isOpen ? "translate-x-0" : "-translate-x-full"
-                    }`}
+                className={`
+                    /* Common Styles */
+                    bg-card border-r border-border transition-all duration-300 ease-in-out flex flex-col z-50
+                    
+                    /* Mobile: Overlay behavior */
+                    fixed inset-y-0 left-0 w-64 md:relative 
+                    ${isOpen ? "translate-x-0 w-64" : "-translate-x-full md:translate-x-0 md:w-0 md:border-none md:overflow-hidden"}
+                `}
             >
+
                 <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
                     <span className="font-semibold text-lg">{t('common.menu')}</span>
-                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0" onClick={onClose}>
+
+                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0 md:hidden" onClick={onClose}>
                         <X className="h-5 w-5" />
                     </Button>
                 </div>

@@ -109,7 +109,16 @@
       "created": "Creado",
       "manage_permissions": "Gestionar Permisos",
       "actions":"Acciones",
-      "state":"Estado"
+      "state":"Estado",
+      "edit":"Editar",
+      "delete":"Eliminar",
+      "create":"Crear",
+      "search":"Buscar",
+      "filter":"Filtrar",
+      "logout":"Cerrar sesión",
+      "menu":"Menú",
+      "language":"Idioma",
+      "view":"Ver"
     },
   "roleManagement":"Gestión de Roles",
   "rolesList":"Lista de todos los roles disponibles en el sistema",
