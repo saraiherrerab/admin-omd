@@ -65,10 +65,17 @@ export default function Login() {
         transition={{ duration: 0.6 }}
         className="hidden lg:flex lg:w-1/2 bg-muted items-center justify-center p-12"
       >
-        <div className="w-full max-w-md aspect-square bg-card/50 rounded-2xl flex items-center justify-center shadow-sm">
+        <div className="w-full max-w-md aspect-square bg-card/50 rounded-2xl flex flex-col p-5 items-center justify-center shadow-sm">
           <div className="text-muted-foreground">
             <img src={logo} alt="OMD Logo" className='w-64 h-64' />
           </div>
+          <p className='text-center text-sm text-muted-foreground'>
+            {t('auth.authorizedPersonnelOnly')}
+            <br />
+            © {new Date().getFullYear()} OneMillionsDollar LLC.
+            <br />
+            {t('auth.allRightsReserved')}
+          </p>
         </div>
       </motion.div>
 
@@ -79,7 +86,7 @@ export default function Login() {
         className="flex-1 flex items-center justify-center p-8 bg-card"
       >
         <div className="w-full max-w-md space-y-8">
-          {/* Logo */}
+
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold">{t('common.appName')}</span>
           </div>
@@ -155,7 +162,9 @@ export default function Login() {
             </Link>
           </p>
         </div>
+
       </motion.div>
+
     </div>
   )
 }

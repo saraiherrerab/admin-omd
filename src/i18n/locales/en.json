@@ -37,7 +37,9 @@
     "loginTitle": "Welcome Back",
     "loginSubtitle": "Log in to your account",
     "registerTitle": "Create Account",
-    "registerSubtitle": "Sign up to get started"
+    "registerSubtitle": "Sign up to get started",
+    "authorizedPersonnelOnly": "Authorized personnel only",
+    "allRightsReserved": "All rights reserved"
   },
   "home": {
     "welcome": "Welcome back",
@@ -89,5 +91,58 @@
    "configSMTP":"Config SMTP",
    "support":"Support",
    "reports":"Reports",
-   "pendingCases":"Pending Cases"}
+   "pendingCases":"Pending Cases"},
+
+  "users": {
+    "title": "Roles & Permissions Management",
+    "subtitle": "Manage system roles, permissions, and access",
+    "roles": "Roles",
+    "users": "Users",
+    "permissions": "Permissions",
+    "audit": "Audit",
+    "labels": {
+         "name": "Name",
+      "description": "Description",
+      "status_active": "Active",
+      "status_inactive": "Inactive",
+      "hierarchy": "Hierarchy",
+      "created": "Created",
+      "manage_permissions": "Manage Permissions",
+      "actions":"Actions",
+      "state":"State"
+    },
+    "roleManagement": "Role Management",
+    "rolesList": "List of all available roles in the system",
+    "createRole": "Create Role",
+    "editRole": "Edit Role",
+    "deleteRole": "Delete Role",
+    "permissionManagement": "Permission Management",
+    "permissionManagementSubtitle": "System Permissions",
+    "createPermission": "Create Permission",
+    "editPermission": "Edit Permission",
+    "deletePermission": "Delete Permission",
+    "userManagement": "User Management",
+    "userManagementSubtitle": "System Users",
+    "createUser": "Create User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "auditManagement": "Audit Management",
+    "auditManagementSubtitle": "System Audits",
+    "createAudit": "Create Audit",
+    "editAudit": "Edit Audit",
+    "deleteAudit": "Delete Audit",
+    "roles_data": {
+      "super_admin": { "name": "Super Administrator", "hierarchy": "Super Admin" },
+      "admin": { "name": "Administrator", "hierarchy": "Admin" },
+      "coupon_manager": { "name": "Coupon Manager", "hierarchy": "Manager" },
+      "ai_manager": { "name": "AI Manager", "hierarchy": "Manager" },
+      "investment_manager": { "name": "Investment Manager", "hierarchy": "Manager" },
+      "staking_manager": { "name": "Staking Manager", "hierarchy": "Manager" },
+      "user_manager": { "name": "User Manager", "hierarchy": "Manager" },
+      "wallet_manager": { "name": "Wallet Manager", "hierarchy": "Manager" },
+      "auditor": { "name": "Auditor", "hierarchy": "Support" },
+      "support": { "name": "Support", "hierarchy": "Support" }
+    }
+  }
+
 }

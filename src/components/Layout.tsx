@@ -15,7 +15,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <Header onMenuClick={() => setSidebarOpen(true)} />
             <Sidebar isOpen={sidebarOpen} onClose={() => { setSidebarOpen(false) }} />
             <main
-                className={`p-6 grid gap-6 md:grid-cols-3 transition-all duration-300 ease-in-out ${sidebarOpen ? "md:ml-64" : ""
+                className={`py-6 px-6 lg:px-20 grid gap-6 md:grid-cols-3 transition-all duration-300 ease-in-out ${sidebarOpen ? "md:ml-64" : ""
                     }`}
             >
                 {children}

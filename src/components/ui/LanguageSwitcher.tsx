@@ -17,7 +17,7 @@ export function LanguageSwitcher() {
       onClick={toggleLanguage}
       className="fixed top-4 right-4 z-50"
     >
-      {i18n.language === 'en' ? '🇪🇸 ES' : '🇺🇸 EN'}
+      {i18n.language === 'en' ? '🇺🇸 EN' : '🇪🇸 ES'}
     </Button>
   );
 }
