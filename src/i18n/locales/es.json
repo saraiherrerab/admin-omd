@@ -35,7 +35,21 @@
       "view": "Ver",
       "email": "Email",
       "role": "Role",
-      "changeStatus": "Cambiar Estado"
+      "changeStatus": "Cambiar Estado",
+      "balance": "Saldo",
+      "allRoles": "Todos los Roles"
+    },
+    "placeholders": {
+      "searchByName": "Buscar por nombre...",
+      "balance": "Saldo..."
+    },
+    "actions": {
+      "clearFilters": "Limpiar Filtros"
+    },
+    "pagination": {
+      "page": "Página",
+      "previous": "Anterior",
+      "next": "Siguiente"
     }
   },
   "auth": {
@@ -121,7 +135,8 @@
     "title": "Gestión Usuarios",
     "subtitle": "Administra usuarios y sus roles",
     "users": "Usuarios",
-    "noUsersFound": "No se encontraron usuarios."
+    "noUsersFound": "No se encontraron usuarios.",
+    "createUser": "Crear Usuario"
   },
   "tabs": {
     "roles": "Roles",

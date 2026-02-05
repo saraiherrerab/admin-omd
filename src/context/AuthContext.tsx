@@ -10,41 +10,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
-  // Initialize auth state from stored token
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = localStorage.getItem('token');
 
       if (storedToken) {
         try {
-          // Decode the token to get user data
           const decoded = jwtDecode<JWTPayload>(storedToken);
+          const isExpired = decoded.exp && decoded.exp * 1000 < Date.now();
 
-          // Check if token is expired
-          if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-            throw new Error('Token expired');
+          if (!isExpired) {
+            setUser({
+              id: decoded.id,
+              email: decoded.email,
+              name: decoded.name,
+              role: decoded.role,
+              username: decoded.username || decoded.email,
+            });
+            setToken(storedToken);
+          } else {
+            localStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
           }
-
-          // Set user data from decoded token
-          setUser({
-            id: decoded.id,
-            email: decoded.email,
-            name: decoded.name,
-            role: decoded.role,
-            username: decoded.username || decoded.email, // Fallback if username missing in token
-          });
-          setToken(storedToken);
-
-        } catch (error) {
-          console.error('Invalid or expired token, attempting refresh:', error);
+        } catch (e) {
+          console.error("Token corrupto");
           localStorage.removeItem('token');
           setToken(null);
+          setUser(null);
         }
+      } else {
+        setToken(null);
+        setUser(null);
       }
       setLoading(false);
     };
-
-
 
     initAuth();
   }, []);
@@ -150,41 +150,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
 
-  /**
-   * Refresh user session and token
-   */
-  const refreshUser = async () => {
-    try {
-      const response = await authService.refreshToken();
 
-      if (response.token) {
-        localStorage.setItem('token', response.token);
-        setToken(response.token);
-
-        const decoded = jwtDecode<JWTPayload>(response.token);
-        setUser({
-          id: decoded.id,
-          email: decoded.email,
-          name: decoded.name,
-          role: decoded.role,
-          username: decoded.username || decoded.email,
-        });
-      } else if (response.user) {
-        setUser({
-          id: Number(response.user.id),
-          email: response.user.email,
-          username: response.user.email,
-          name: response.user.name || '',
-          role: response.user.role || 'user',
-        });
-      }
-    } catch (error) {
-      console.error('Failed to refresh session:', error);
-      // If refresh fails (e.g. 401), we might want to let the user stay until they do something that requires auth
-      // or we could logout. For strict security, one might logout here.
-      // But let's avoid auto-logout for now to prevent UX loops.
-    }
-  };
 
   return (
     <AuthContext.Provider value={{
@@ -193,7 +159,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       login,
       register,
       logout,
-      refreshUser,
       isAuthenticated: !!user,
       loading
     }}>

@@ -78,14 +78,7 @@ class AuthService {
 
 
 
-  /**
-   * Refresh token
-   * @returns New token
-   */
-  async refreshToken(): Promise<LoginResponse> {
-    const response = await api.post<LoginResponse>('/auth/refresh');
-    return response.data;
-  }
+
 }
 
 export default new AuthService();

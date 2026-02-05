@@ -10,48 +10,36 @@ import { Table } from "@/components/ui/Table";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+
 
 
 export const Users = () => {
     const { t } = useTranslation();
-    const { users, getUsers, loading, error, deleteUser } = useUsers();
+    const { users, getUsers, loading, error, pagination } = useUsers();
 
     const { getRoles, roles } = useRoles();
     const [openDialog, setOpenDialog] = useState(false);
     const [userToEdit, setUserToEdit] = useState<User | null>(null);
-    const PAGE_LIMIT = 10;
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
-    const [totalUsers, setTotalUsers] = useState(0);
-    /**
-     * Filters
-     */
-    const [includeRoles, setIncludeRoles] = useState(true);
-    const [name, setName] = useState('');
-    const [balance, setBalance] = useState('');
-    const [role, setRole] = useState('');
+    const PAGE_LIMIT = 5;
+    const [filters, setFilters] = useState({
+        name: '',
+        balance: '',
+        role: '',
+        includeRoles: true,
+        includePermissions: true,
+        page: 1,
+        limit: PAGE_LIMIT
+    });
 
-
-
-    const [searchQuery, setSearchQuery] = useState('');
-
-
-
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-
-
-
-
-
-    // handle filters
-    const handleFilter = (filter: string, value: string | number | boolean) => {
-        // getUsers with filters
-        getUsers({ [filter]: value });
+    const updateFilter = (filter: string, value: any) => {
+        setFilters(prev => ({ ...prev, [filter]: value, page: 1 }));
     };
 
     useEffect(() => {
-        getUsers();
-    }, [getUsers]);
+        getUsers(filters);
+    }, [getUsers, filters]);
 
     useEffect(() => {
         getRoles();
@@ -67,12 +55,6 @@ export const Users = () => {
         setOpenDialog(true);
     };
 
-
-    const handleDelete = async (user: User) => {
-        if (window.confirm(t('users.confirmDeleteUser'))) {
-            await deleteUser(user.id);
-        }
-    };
     return (
         <Layout>
             <div>
@@ -86,6 +68,55 @@ export const Users = () => {
                         {t('users.createUser')}
                     </Button>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-card p-4 rounded-lg border">
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm font-medium">{t('common.labels.name')}</label>
+                        <Input
+                            placeholder={t('common.placeholders.searchByName')}
+                            value={filters.name}
+                            onChange={(e) => updateFilter('name', e.target.value)}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm font-medium">{t('common.labels.balance')}</label>
+                        <Input
+                            type="number"
+                            placeholder={t('common.placeholders.balance')}
+                            value={filters.balance}
+                            onChange={(e) => updateFilter('balance', e.target.value)}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm font-medium">{t('common.labels.role')}</label>
+                        <Select
+                            value={filters.role}
+                            onChange={(e) => updateFilter('role', e.target.value)}
+                            options={[
+                                { value: '', label: t('common.labels.allRoles') },
+                                ...roles.map(r => ({ value: r.id.toString(), label: r.name }))
+                            ]}
+                        />
+                    </div>
+                    <div className="flex items-end">
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => setFilters({
+                                name: '',
+                                balance: '',
+                                role: '',
+                                includeRoles: true,
+                                includePermissions: true,
+                                page: 1,
+                                limit: PAGE_LIMIT
+                            })}
+                        >
+                            {t('common.actions.clearFilters')}
+                        </Button>
+                    </div>
+                </div>
+
                 <div className="flex flex-col gap-4">
                     {loading ? (
                         <p>{t('common.loading')}</p>
@@ -93,7 +124,7 @@ export const Users = () => {
                         <Table
                             headers={[t('common.labels.name'), t('common.labels.email'), t('common.labels.role'), t('common.labels.state'), t('common.labels.actions')]}
                         >
-                            {users.map((user) => (
+                            {users.map((user: User) => (
                                 <tr key={user.id} className="block md:table-row bg-card mb-4 rounded-lg shadow-sm border p-4 md:p-0 md:mb-0 md:shadow-none md:border-b md:border-border md:bg-transparent">
                                     <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
                                         <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.name')}</span>
@@ -107,7 +138,7 @@ export const Users = () => {
 
                                     <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
                                         <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.role')}</span>
-                                        {user.roles.map(role => role.name).join(', ')}
+                                        {user.roles.map((role: any) => role.name).join(', ')}
                                     </td>
 
                                     <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
@@ -120,7 +151,6 @@ export const Users = () => {
                                         <div className="flex gap-2">
                                             <ButtonGroup>
                                                 <Button variant="ghost" className="justify-start" onClick={() => handleEdit(user)}>{t('common.labels.edit')}</Button>
-                                                <Button variant="destructive" className="justify-start" onClick={() => handleDelete(user)}>{t('common.labels.delete')}</Button>
                                             </ButtonGroup>
                                         </div>
                                     </td>
@@ -130,6 +160,30 @@ export const Users = () => {
                     ) : (
                         <p className="text-center py-8 text-muted-foreground">{error || t('users.noRolesFound')}</p>
                     )}
+
+                    <div className="flex justify-between items-center mt-4">
+                        <p className="text-sm text-muted-foreground">
+                            {t('common.pagination.page')} {filters.page} {pagination?.pages ? `of ${pagination.pages}` : ''}
+                        </p>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={filters.page === 1}
+                                onClick={() => updateFilter('page', filters.page - 1)}
+                            >
+                                {t('common.pagination.previous')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={pagination?.pages ? filters.page >= pagination.pages : false}
+                                onClick={() => updateFilter('page', filters.page + 1)}
+                            >
+                                {t('common.pagination.next')}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
 
 
