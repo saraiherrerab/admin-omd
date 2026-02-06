@@ -1,3 +1,4 @@
+import type { Role } from '@/types/roles';
 import api from './api';
 
 export interface LoginRequest {
@@ -11,13 +12,13 @@ export interface LoginResponse {
     id: string;
     email: string;
     name?: string;
-    role?: string;
+    roles?: Pick<Role, 'id'>[];
   };
   message?: string;
 }
 
 export interface RegisterRequest {
-  username: string;
+  // username: string;
   password: string;
   name?: string;
   email?: string;

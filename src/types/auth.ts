@@ -2,13 +2,15 @@
  * User type definitions
  */
 
+import type { Role } from "./roles";
+
 export interface User {
   id: number;
   email: string;
-  username: string;
+  // username: string;
   name: string;
   password?: string;
-  role: string;
+  roles: Pick<Role, 'id'>[];
 }
 
 export interface JWTPayload extends User {

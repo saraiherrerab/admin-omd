@@ -63,7 +63,7 @@ export default function Register() {
     <div className="flex min-h-screen bg-background text-foreground">
       <LanguageSwitcher />
       {/* Left Panel - Image */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
@@ -77,7 +77,7 @@ export default function Register() {
       </motion.div>
 
       {/* Right Panel - Form */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
@@ -151,17 +151,17 @@ export default function Register() {
                   I will remove the static help text to avoid duplication/clutter when error shows.
               */}
               {!errors.password && (
-                 <p className="text-xs text-muted-foreground">
-                   {t('validation.passwordTooShort')}
-                 </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('validation.passwordTooShort')}
+                </p>
               )}
             </div>
 
             {authError && <p className="text-sm text-destructive">{authError}</p>}
 
-            <Button 
-              type="submit" 
-              variant="primary" 
+            <Button
+              type="submit"
+              variant="primary"
               size="lg"
               className="w-full font-semibold"
               disabled={isLoading}

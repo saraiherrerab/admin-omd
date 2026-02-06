@@ -7,6 +7,7 @@ export interface User {
     name: string;
     lastname: string; 
     balance: string | number;
+    phone: string;
     password?: string; // Optional as it might not always be returned
     roles:  Pick<Role, 'id' | 'name'>[]; 
     status: string;

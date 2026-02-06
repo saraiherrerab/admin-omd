@@ -2,13 +2,17 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { jwtDecode } from 'jwt-decode';
 import authService from '@/services/authService';
 import type { User, JWTPayload, AuthContextType } from '@/types/auth';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  // const toast = useToast();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -24,8 +28,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               id: decoded.id,
               email: decoded.email,
               name: decoded.name,
-              role: decoded.role,
-              username: decoded.username || decoded.email,
+              roles: decoded.roles || [],
+              // username: decoded.username || decoded.email,
             });
             setToken(storedToken);
           } else {
@@ -56,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Call the login API (note: your API uses "username" field)
       const response = await authService.login(email, password);
-
+      //  console.log(response)
       // The API might return a token in the response or set it as a cookie
       // If it returns a token, store it
       if (response.token) {
@@ -65,21 +69,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Decode token to get user info
         const decoded = jwtDecode<JWTPayload>(response.token);
+        // console.log(decoded)
         setUser({
           id: decoded.id,
-          email: decoded.email,
-          name: decoded.name,
-          role: decoded.role,
-          username: decoded.username,
+          email: response?.user?.email!,
+          name: response?.user?.name!,
+          roles: response?.user?.roles || [],
+          // username: response?.user?.username!,
         });
+
       } else if (response.user) {
         // If API returns user data directly (cookie-based auth)
         setUser({
           id: Number(response.user.id),
           email: response.user.email,
-          username: response.user.email, // Fallback
+          // username: response.user.email, // Fallback
           name: response.user.name || '',
-          role: response.user.role || 'user',
+          roles: response.user.roles || []
         });
       }
 
@@ -96,33 +102,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (email: string, password: string, name: string) => {
     try {
       const response = await authService.register({
-        username: email,
+        // username: email,
         password,
         name,
         email,
       });
 
-      // After successful registration, log the user in
+      // After successful registration, send to login
       if (response.token) {
-        localStorage.setItem('token', response.token);
-        setToken(response.token);
-
-        const decoded = jwtDecode<JWTPayload>(response.token);
-        setUser({
-          id: decoded.id,
-          email: decoded.email,
-          name: decoded.name,
-          role: decoded.role,
-          username: decoded.username,
-        });
-      } else if (response.user) {
-        setUser({
-          id: Number(response.user.id),
-          email: response.user.email,
-          username: response.user.email, // Fallback
-          name: response.user.name || '',
-          role: response.user.role || 'user',
-        });
+        navigate('/login');
+        toast.success('Registration successful');
       }
 
     } catch (error: any) {

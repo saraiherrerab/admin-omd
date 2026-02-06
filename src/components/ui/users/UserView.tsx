@@ -44,6 +44,14 @@ export const UserView = ({ userToView }: UserViewProps) => {
                     <p>{user?.username}</p>
                 </div>
                 <div className="flex flex-col gap-2">
+                    <p className="text-lg font-bold">{t('common.labels.phone')}</p>
+                    <p>{user?.phone}</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <p className="text-lg font-bold">{t('common.labels.status')}</p>
+                    <p><Chip variant={user?.status === 'active' ? 'default' : 'destructive'} label={user?.status!} /></p>
+                </div>
+                <div className="flex flex-col gap-2">
                     <p className="text-lg font-bold">{t('common.labels.balance')}</p>
                     <p>{user?.balance}</p>
                 </div>
@@ -54,10 +62,6 @@ export const UserView = ({ userToView }: UserViewProps) => {
                             <Chip variant="outline" key={role.id} label={role.name} />
                         ))}
                     </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <p className="text-lg font-bold">{t('common.labels.status')}</p>
-                    <p>{user?.status}</p>
                 </div>
                 <div className="flex flex-col gap-2">
                     <p className="text-lg font-bold">{t('common.labels.createdAt')}</p>

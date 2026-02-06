@@ -7,21 +7,18 @@ import { useAuth } from '@/context/AuthContext';
 export function useUser() {
   const { user, isAuthenticated, loading } = useAuth();
 
-  const isAdmin = user?.role === 'admin' || user?.role === 'Admin';
-  const isUser = user?.role === 'user' || user?.role === 'User';
-  
   return {
     // User data
     user,
     userId: user?.id,
     userEmail: user?.email,
     userName: user?.name,
-    userRole: user?.role,
+    userRoles: user?.roles,
     
     // Booleans
     isAuthenticated,
-    isAdmin,
-    isUser,
+    // isAdmin,
+    // isUser,
     loading,
   };
 }
