@@ -15,6 +15,7 @@ import { Select } from "@/components/ui/Select";
 import { Pagination } from "@/components/ui/Pagination";
 import { Dialog } from "@/components/ui/Dialog";
 import { UserView } from "@/components/ui/users/UserView";
+import { AssignRolesForm } from "@/components/ui/users/AssignRolesForm";
 
 
 
@@ -24,7 +25,9 @@ export const Users = () => {
 
     const { getRoles, roles } = useRoles();
     const [openDialog, setOpenDialog] = useState(false);
+    const [openAssignRolesDialog, setOpenAssignRolesDialog] = useState(false);
     const [userToView, setUserToView] = useState<number | null>(null);
+    const [userToAssignRoles, setUserToAssignRoles] = useState<number | null>(null);
 
     /**
      * Individual filters
@@ -56,9 +59,9 @@ export const Users = () => {
         getRoles();
     }, [getRoles]);
 
-    const handleOpenCreate = () => {
-        setUserToView(null);
-        setOpenDialog(true);
+    const handleAssignRoles = (userId: number) => {
+        setUserToAssignRoles(userId);
+        setOpenAssignRolesDialog(true);
     };
 
     const handleView = (user: User) => {
@@ -74,10 +77,7 @@ export const Users = () => {
                         <h1 className="text-2xl font-bold">{t('users.title')}</h1>
                         <p className="text-muted-foreground">{t('users.subtitle')}</p>
                     </div>
-                    <Button className="flex gap-2 py-4 px-6" onClick={handleOpenCreate}>
-                        <Plus size={20} />
-                        {t('common.labels.assign')}
-                    </Button>
+
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-card p-4 rounded-lg border">
@@ -154,6 +154,9 @@ export const Users = () => {
                                         <div className="flex gap-2">
                                             <ButtonGroup>
                                                 <Button variant="ghost" className="justify-start" onClick={() => handleView(user)}>{t('common.labels.view')}</Button>
+                                                <Button variant="ghost" className="flex gap-2 py-4 px-6" onClick={() => handleAssignRoles(user.id)}>
+                                                    {t('common.labels.assign')}
+                                                </Button>
                                             </ButtonGroup>
                                         </div>
                                     </td>
@@ -174,6 +177,10 @@ export const Users = () => {
 
                     <UserView userToView={userToView} />
 
+                </Dialog>
+
+                <Dialog open={openAssignRolesDialog} onClose={() => setOpenAssignRolesDialog(false)} >
+                    <AssignRolesForm userId={userToAssignRoles!} onClose={() => setOpenAssignRolesDialog(false)} />
                 </Dialog>
 
             </div>

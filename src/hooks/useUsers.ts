@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
-import api from '../services/api';
-import type  { Role, CreateRoleDTO, UpdateRoleDTO } from '../types/roles';
+import api from '../services/api'; 
 import { toast } from 'react-toastify';
 import type { User, UserFilters } from '@/types/users';
 
@@ -62,6 +61,23 @@ export const useUsers = () => {
     }
   }, []);
 
+  const assignRole = useCallback(async (userId: number, roleIds: number[]) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.put(`/users/${userId}/roles`, { roles:roleIds });
+      if (response.data.success) {
+        toast.success(response.data.message || 'Role assigned successfully');
+      }
+      return null;
+    } catch (err: any) {
+      console.error(`Error assigning role to user ${userId}:`, err);
+      setError(err.response?.data?.message || err.message || 'Error assigning role');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return {
     users,
@@ -71,5 +87,6 @@ export const useUsers = () => {
     pagination,
     getUsers,
     getUser,
+    assignRole,
   };
 };

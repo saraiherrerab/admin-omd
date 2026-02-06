@@ -40,7 +40,8 @@
       "changeStatus": "Change Status",
       "balance": "Balance",
       "allRoles": "All Roles",
-      "assign": "Assign role"
+      "assign": "Assign role",
+      "user": "User"
     },
     "placeholders": {
       "searchByName": "Search by name...",

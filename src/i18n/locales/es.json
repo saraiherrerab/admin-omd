@@ -36,7 +36,7 @@
       "language": "Idioma",
       "view": "Ver",
       "email": "Email",
-      "role": "Role",
+      "role": "Rol",
       "changeStatus": "Cambiar Estado",
       "balance": "Saldo",
       "allRoles": "Todos los Roles",
@@ -45,7 +45,8 @@
       "createdAt": "Fecha de creación",
       "updatedAt": "Fecha de actualización",
       "roles": "Roles",
-      "status": "Estado"
+      "status": "Estado",
+      "user": "Usuario"
     },
     "placeholders": {
       "searchByName": "Buscar por nombre...",
