@@ -20,6 +20,7 @@
       "status_active": "Active",
       "status_inactive": "Inactive",
       "hierarchy": "Hierarchy",
+      "permissions": "Permissions",
       "created": "Created",
       "manage_permissions": "Manage Permissions",
       "actions": "Actions",
@@ -149,6 +150,8 @@
     "rolesList": "List of all available roles in the system",
     "confirmDeleteRole": "Are you sure you want to delete this role?",
     "noRolesFound": "No roles found.",
+    "editRole": "Manage Permissions",
+    "permissions": "Permissions",
     "roles_data": {
       "super_admin": {
         "name": "Super Administrator",

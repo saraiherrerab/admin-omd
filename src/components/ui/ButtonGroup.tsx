@@ -27,7 +27,7 @@ export const ButtonGroup = ({ children }: ButtonGroupProps) => {
             )}
             <div
                 className={cn(
-                    "absolute right-0 top-full mt-1 z-50 min-w-[10rem] flex-col rounded-md border bg-white p-1 shadow-lg",
+                    "absolute right-0 top-full mt-1 z-50 min-w-[12rem] flex-col rounded-md border bg-white p-1 shadow-lg",
                     open ? "flex" : "hidden"
                 )}
             >

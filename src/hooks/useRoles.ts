@@ -49,6 +49,7 @@ export const useRoles = () => {
     setLoading(true);
     setError(null);
     try {
+      console.log(roleData);
       const response = await api.post('/roles', roleData);
       if (response.data.success) {
         await getRoles(); // Refresh the list

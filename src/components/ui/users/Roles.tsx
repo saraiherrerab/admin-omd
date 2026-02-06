@@ -9,11 +9,14 @@ import { Dialog } from "../Dialog";
 import { RoleForm } from "./RoleForm";
 import type { Role } from "@/types/roles";
 import { Spinner } from "../Spinner";
+import { RoleView } from "./RoleView";
 export const Roles = () => {
     const { t } = useTranslation();
     const { roles, getRoles, loading, error, deleteRole } = useRoles();
     const [openDialog, setOpenDialog] = useState(false);
     const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
+    const [openViewDialog, setOpenViewDialog] = useState(false);
+    const [roleToView, setRoleToView] = useState<Role | null>(null);
 
     useEffect(() => {
         getRoles();
@@ -38,6 +41,16 @@ export const Roles = () => {
         if (window.confirm(t('users.confirmDeleteRole'))) {
             await deleteRole(role.id);
         }
+    };
+
+    const handleView = (role: Role) => {
+        setRoleToView(role);
+        setOpenViewDialog(true);
+    };
+
+    const handleCloseView = () => {
+        setOpenViewDialog(false);
+        setRoleToView(null);
     };
 
     return (
@@ -67,7 +80,7 @@ export const Roles = () => {
                                     </td>
                                     <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
                                         <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.hierarchy')}</span>
-                                        {role.hierarchy}
+                                        {role.hierarchy_level}
                                     </td>
                                     <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
                                         <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.state')}</span>
@@ -83,8 +96,9 @@ export const Roles = () => {
                                         <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.actions')}</span>
                                         <div className="flex gap-2">
                                             <ButtonGroup >
-                                                <Button variant="ghost" className="justify-start" onClick={() => handleEdit(role)}>{t('common.labels.edit')}</Button>
-                                                <Button variant="ghost" className="justify-start w-full" onClick={() => handleEdit(role)}>{t('common.labels.changeStatus')}</Button>
+                                                <Button variant="ghost" className="justify-start" onClick={() => { handleView(role) }}>{t('common.labels.view')}</Button>
+                                                <Button variant="ghost" className="justify-start" onClick={() => handleEdit(role)}>{t('roles.editRole')}</Button>
+                                                {/* <Button variant="ghost" className="justify-start w-full" onClick={() => handleEdit(role)}>{t('common.labels.changeStatus')}</Button> */}
                                                 <Button variant="destructive" className="justify-start" onClick={() => handleDelete(role)}>{t('common.labels.delete')}</Button>
                                             </ButtonGroup>
                                         </div>
@@ -99,6 +113,11 @@ export const Roles = () => {
             </div>
             <Dialog open={openDialog} onClose={handleClose}>
                 <RoleForm onClose={handleClose} roleToEdit={roleToEdit} />
+            </Dialog>
+
+            {/* Dialog only for view */}
+            <Dialog open={openViewDialog} onClose={handleCloseView}>
+                <RoleView onClose={handleCloseView} roleToEdit={roleToView} />
             </Dialog>
         </>
     )
