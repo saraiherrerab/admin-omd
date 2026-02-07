@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Pagination } from "@/components/ui/Pagination";
 import { Plus } from "lucide-react";
+import { CouponForm } from "@/components/ui/coupons/CouponForm";
 
 
 export const Coupons = () => {
@@ -122,6 +123,7 @@ export const Coupons = () => {
                 <Input
                     type="text"
                     placeholder={t('coupons.filters.code')}
+                    className="w-full md:w-auto"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                 />
@@ -130,6 +132,7 @@ export const Coupons = () => {
                 <Input
                     type="text"
                     placeholder={t('coupons.filters.pool')}
+                    className="w-full md:w-auto"
                     value={pool}
                     onChange={(e) => setPool(e.target.value)}
                 />
@@ -137,6 +140,7 @@ export const Coupons = () => {
 
                 <Select
                     label={t('coupons.filters.redeemed')}
+                    className="w-full md:w-auto"
                     value={is_redeemed === undefined ? '' : is_redeemed.toString()}
                     options={[
                         { value: '', label: t('coupons.filters.all') },
@@ -149,12 +153,14 @@ export const Coupons = () => {
                 <Input
                     type="text"
                     placeholder={t('coupons.filters.redeemedBy')}
+                    className="w-full md:w-auto"
                     value={redeemed_by || ''}
                     onChange={(e) => setRedeemedBy(e.target.value ? parseInt(e.target.value) : undefined)}
                 />
 
                 <Select
                     label={t('coupons.filters.returnable')}
+                    className="w-full md:w-auto"
                     value={returnable === undefined ? '' : returnable.toString()}
                     options={[
                         { value: '', label: t('coupons.filters.all') },
@@ -167,12 +173,14 @@ export const Coupons = () => {
                     type="number"
                     min={0}
                     placeholder={t('coupons.filters.minAmount')}
+                    className="w-full md:w-auto"
                     value={min_amount || ''}
                     onChange={(e) => setMinAmount(e.target.value ? parseInt(e.target.value) : undefined)}
                 />
 
                 <Input
                     type="number"
+                    className="w-full md:w-auto"
                     placeholder={t('coupons.filters.maxAmount')}
                     value={max_amount || ''}
                     onChange={(e) => setMaxAmount(e.target.value ? parseInt(e.target.value) : undefined)}
@@ -180,15 +188,17 @@ export const Coupons = () => {
 
                 <div className="flex flex-col   gap-2">
 
-                    <div className="flex flex-col md:flex-row gap-2">
+                    <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
                         <Input
                             type="date"
+                            className="w-full md:w-auto"
                             placeholder={t('coupons.filters.expiredAfter')}
                             value={expires_after || ''}
                             onChange={(e) => setExpiresAfter(e.target.value)}
                         />
                         <Input
                             type="date"
+                            className="w-full md:w-auto"
                             placeholder={t('coupons.filters.expiredBefore')}
                             value={expires_before || ''}
                             onChange={(e) => setExpiresBefore(e.target.value)}
@@ -204,12 +214,14 @@ export const Coupons = () => {
                     <Input
                         type="date"
                         placeholder={t('coupons.filters.createdAfter')}
+                        className="w-full md:w-auto"
                         value={created_after || ''}
                         onChange={(e) => setCreatedAfter(e.target.value)}
                     />
                     <Input
                         type="date"
                         placeholder={t('coupons.filters.createdBefore')}
+                        className="w-full md:w-auto"
                         value={created_before || ''}
                         onChange={(e) => setCreatedBefore(e.target.value)}
                     />
@@ -267,8 +279,7 @@ export const Coupons = () => {
 
 
             <Dialog open={open} onClose={() => setOpen(false)} >
-                <>
-                </>
+                <CouponForm onClose={() => setOpen(false)} />
             </Dialog>
         </Layout>
     )

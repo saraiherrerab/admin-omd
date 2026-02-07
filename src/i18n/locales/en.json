@@ -16,6 +16,7 @@
     "language": "Language",
     "accept": "Accept",
     "decline": "Decline",
+    "generateCode": "Generate code",
     "labels": {
       "name": "Name",
       "description": "Description",
@@ -225,6 +226,8 @@
     "title": "Coupon Management",
     "subtitle": "Create and manage discount coupons",
     "noCouponsFound": "No coupons found.",
+    "createCoupon": "Create Coupon",
+    "editCoupon": "Edit Coupon",
     "filters": {
       "all": "All",
       "active": "Active",
@@ -255,6 +258,18 @@
       "with_return": "With return",
       "creator": "Creator",
       "pool": "Pool"
+    },
+    "labels": {
+      "amount": "Amount",
+      "code": "Code",
+      "expirationRange": "Expiration range",
+      "expirationMin": "Expiration min",
+      "expirationMax": "Expiration max",
+      "redeemed_by": "Redeemed by",
+      "with_return": "With return",
+      "creator": "Creator",
+      "pool": "Pool",
+      "currency": "Currency"
     }
   }
 }

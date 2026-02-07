@@ -2,7 +2,7 @@ import { type ComponentProps, forwardRef } from "react"
 import { cn } from "@/lib/utils"
 
 interface SelectProps extends ComponentProps<"select"> {
-    options: { value: string; label: string }[]
+    options: { value: any; label: string }[]
     label: string
 }
 const Select = forwardRef<HTMLSelectElement, SelectProps>(

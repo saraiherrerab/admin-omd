@@ -45,14 +45,15 @@ export interface CouponFilters {
 
 export interface CreateCouponDTO {
     code: string;
+    pool: string; 
     amount: number;
-    is_redeemed?: boolean;
-    redeemed_by?: number;
-    expiration_date?: Date;
-    pool: string;
-    token: string;
-    with_return: boolean;
     status: string;
+    start_date: Date;
+    expiration_date: Date;
+    is_redeemed?: boolean;
+    promo?: number;
+    with_return: boolean;
+    currency?: string;
     creator: {
         id: number;
         email: string;

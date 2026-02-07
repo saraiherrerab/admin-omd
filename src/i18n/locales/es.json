@@ -16,6 +16,7 @@
     "language": "Idioma",
     "accept": "Aceptar",
     "decline": "Declinar",
+    "generateCode": "Generar código",
     "messages": {
       "createSuccess": "Creado exitosamente",
       "updateSuccess": "Actualizado exitosamente",
@@ -231,6 +232,8 @@
     "title": "Gestión de Cupones",
     "subtitle": "Crear y administrar cupones de descuento",
     "noCouponsFound": "No se encontraron cupones.",
+    "createCoupon": "Crear Cupón",
+    "editCoupon": "Editar Cupón",
     "filters": {
       "all": "Todos",
       "active": "Activos",
@@ -262,6 +265,18 @@
       "with_return": "Con retorno",
       "creator": "Creador",
       "pool": "Pool"
+    },
+    "labels": {
+      "amount": "Monto",
+      "code": "Código",
+      "expirationRange": "Rango de expiración",
+      "expirationMin": "Activo desde",
+      "expirationMax": "Activo hasta",
+      "redeemed_by": "Redimido por",
+      "with_return": "Con retorno",
+      "creator": "Creador",
+      "pool": "Pool",
+      "currency": "Moneda"
     }
   }
 }
