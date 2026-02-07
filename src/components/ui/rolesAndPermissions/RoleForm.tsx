@@ -24,10 +24,11 @@ type FormData = yup.InferType<typeof schema>;
 
 interface RoleFormProps {
     onClose: () => void;
+    onSuccess?: () => void;
     roleToEdit?: Role | null;
 }
 
-export const RoleForm = ({ onClose, roleToEdit }: RoleFormProps) => {
+export const RoleForm = ({ onClose, onSuccess, roleToEdit }: RoleFormProps) => {
     const { t } = useTranslation();
     const { createRole, updateRole, loading } = useRoles();
     const { permissions, getPermissions } = usePermissions();
@@ -78,7 +79,7 @@ export const RoleForm = ({ onClose, roleToEdit }: RoleFormProps) => {
                     hierarchy_level: data.hierarchy_level,
                     permissions: selectedPermissions,
                 });
-                toast.success('Role updated successfully');
+                toast.success(t('common.messages.updateSuccess'));
             } else {
                 console.log(data.name, data.description, selectedPermissions);
                 await createRole({
@@ -87,8 +88,9 @@ export const RoleForm = ({ onClose, roleToEdit }: RoleFormProps) => {
                     hierarchy_level: data.hierarchy_level,
                     permissions: selectedPermissions
                 });
-                toast.success('Role created successfully');
+                toast.success(t('common.messages.createSuccess'));
             }
+            if (onSuccess) onSuccess();
             onClose();
         } catch (err: any) {
             console.error(err);
@@ -161,7 +163,7 @@ export const RoleForm = ({ onClose, roleToEdit }: RoleFormProps) => {
                     {t('common.cancel')}
                 </Button>
                 <Button type="submit" disabled={loading}>
-                    {roleToEdit ? t('common.save') : t('users.createRole')}
+                    {roleToEdit ? t('common.save') : t('common.create')}
                 </Button>
             </div>
         </>
@@ -169,7 +171,7 @@ export const RoleForm = ({ onClose, roleToEdit }: RoleFormProps) => {
 
     return (
         <div className="flex flex-col gap-4 w-full">
-            <h2 className="text-xl font-bold">{roleToEdit ? t('roles.editRole') : t('users.createRole')}</h2>
+            <h2 className="text-xl font-bold">{roleToEdit ? t('roles.editRole') : t('roles.createRole')}</h2>
             <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit(onSubmit)}>
                 {renderRoleContent()}
             </form>

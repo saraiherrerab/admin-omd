@@ -11,7 +11,7 @@ interface TableProps {
 export const Table = ({ title, subtitle, headers, children }: TableProps) => {
     // console.log(rows)
     return (
-        <div className="flex flex-col gap-4 p-6 bg-secondary rounded-lg text-left">
+        <div className="flex flex-col gap-4 p-6 bg-secondary rounded-lg text-left overflow-x-auto">
             {title && <h3 className="text-lg font-semibold">{title}</h3>}
             {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
             <table className="w-full">

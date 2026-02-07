@@ -14,6 +14,8 @@
     "logout": "Logout",
     "menu": "Menu",
     "language": "Language",
+    "accept": "Accept",
+    "decline": "Decline",
     "labels": {
       "name": "Name",
       "description": "Description",
@@ -156,6 +158,13 @@
     "noRolesFound": "No roles found.",
     "editRole": "Manage Permissions",
     "permissions": "Permissions",
+    "deleteRole": "Delete Role",
+    "createRole": "Create Role",
+    "messages": {
+      "createSuccess": "Role created successfully",
+      "updateSuccess": "Role updated successfully",
+      "deleteSuccess": "Role deleted successfully"
+    },
     "roles_data": {
       "super_admin": {
         "name": "Super Administrator",
@@ -212,5 +221,36 @@
     "auditManagement": "Audit Management",
     "auditManagementSubtitle": "System Audits",
     "noAuditsFound": "No audits found."
+  },
+  "coupons": {
+    "title": "Coupon Management",
+    "subtitle": "Create and manage discount coupons",
+    "noCouponsFound": "No coupons found.",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "promo": "PROMO",
+      "used": "Used",
+      "expiredAfter": "Expired after",
+      "expiredBefore": "Expired before",
+      "createdAfter": "Created after",
+      "createdBefore": "Created before",
+      "minAmount": "Minimum amount",
+      "maxAmount": "Maximum amount",
+      "code": "Code",
+      "redeemedBy": "Redeemed by",
+      "redeemed": "Redeemed",
+      "notRedeemed": "Not redeemed",
+      "creator": "Creator"
+    },
+    "headers": {
+      "code": "Code",
+      "amount": "Amount",
+      "status": "Status",
+      "expiration_date": "Expiration date",
+      "redeemed_by": "Redeemed by",
+      "with_return": "With return",
+      "creator": "Creator"
+    }
   }
 }

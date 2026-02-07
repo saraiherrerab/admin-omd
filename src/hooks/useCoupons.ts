@@ -1,20 +1,33 @@
 import { useState, useCallback } from 'react';
 import api from '../services/api';
-import type  { Coupon } from '../types/coupons';
+import type  { Coupon, CouponFilters } from '../types/coupons';
 
 export const useCoupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<{ 
+    total: number; 
+    totalPages: number; 
+    page: number;
+    limit: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  } | null>(null);
   
 
-  const getCoupons = useCallback(async () => {
+  const getCoupons = useCallback(async (filters: CouponFilters) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(`/coupons`);
+        // Remove empty strings, null, and undefined values from params
+      const params = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+      );
+      const response = await api.get(`/coupons/search`, { params });
       if (response.data.success) {
         setCoupons(response.data.data);
+        setPagination(response.data.pagination);
       } else {
         setError(response.data.message || 'Failed to fetch coupons');
       }
@@ -51,5 +64,6 @@ export const useCoupons = () => {
     error,
     getCoupons,
     getCoupon,
+    pagination,
   };
 };

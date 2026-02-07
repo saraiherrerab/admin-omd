@@ -155,12 +155,12 @@ export default function Login() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground">
+          {/* <p className="text-center text-sm text-muted-foreground">
             {t('auth.noAccount')}{" "}
             <Link to="/register" className="text-primary hover:underline font-medium">
               {t('auth.register')}
             </Link>
-          </p>
+          </p> */}
         </div>
 
       </motion.div>
