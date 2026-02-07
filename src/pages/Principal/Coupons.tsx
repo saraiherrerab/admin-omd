@@ -117,7 +117,7 @@ export const Coupons = () => {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-card p-4 rounded-lg border">
+            <div className="flex flex-col md:flex-row flex-nowrap md:flex-wrap gap-4 mb-6 bg-card p-4 rounded-lg border">
 
                 <Input
                     type="text"
@@ -125,13 +125,18 @@ export const Coupons = () => {
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                 />
+
+
                 <Input
                     type="text"
                     placeholder={t('coupons.filters.pool')}
                     value={pool}
                     onChange={(e) => setPool(e.target.value)}
                 />
+
+
                 <Select
+                    label={t('coupons.filters.redeemed')}
                     value={is_redeemed === undefined ? '' : is_redeemed.toString()}
                     options={[
                         { value: '', label: t('coupons.filters.all') },
@@ -140,13 +145,16 @@ export const Coupons = () => {
                     ]}
                     onChange={(e) => setIsRedeemed(e.target.value === '' ? undefined : e.target.value === 'true')}
                 />
+
                 <Input
                     type="text"
                     placeholder={t('coupons.filters.redeemedBy')}
                     value={redeemed_by || ''}
                     onChange={(e) => setRedeemedBy(e.target.value ? parseInt(e.target.value) : undefined)}
                 />
+
                 <Select
+                    label={t('coupons.filters.returnable')}
                     value={returnable === undefined ? '' : returnable.toString()}
                     options={[
                         { value: '', label: t('coupons.filters.all') },
@@ -157,10 +165,12 @@ export const Coupons = () => {
                 />
                 <Input
                     type="number"
+                    min={0}
                     placeholder={t('coupons.filters.minAmount')}
                     value={min_amount || ''}
                     onChange={(e) => setMinAmount(e.target.value ? parseInt(e.target.value) : undefined)}
                 />
+
                 <Input
                     type="number"
                     placeholder={t('coupons.filters.maxAmount')}
@@ -168,31 +178,43 @@ export const Coupons = () => {
                     onChange={(e) => setMaxAmount(e.target.value ? parseInt(e.target.value) : undefined)}
                 />
 
-                <Input
-                    type="date"
-                    placeholder={t('coupons.filters.expiredAfter')}
-                    value={expires_after || ''}
-                    onChange={(e) => setExpiresAfter(e.target.value)}
-                />
-                <Input
-                    type="date"
-                    placeholder={t('coupons.filters.expiredBefore')}
-                    value={expires_before || ''}
-                    onChange={(e) => setExpiresBefore(e.target.value)}
-                />
+                <div className="flex flex-col   gap-2">
 
-                <Input
-                    type="date"
-                    placeholder={t('coupons.filters.createdAfter')}
-                    value={created_after || ''}
-                    onChange={(e) => setCreatedAfter(e.target.value)}
-                />
-                <Input
-                    type="date"
-                    placeholder={t('coupons.filters.createdBefore')}
-                    value={created_before || ''}
-                    onChange={(e) => setCreatedBefore(e.target.value)}
-                />
+                    <div className="flex flex-col md:flex-row gap-2">
+                        <Input
+                            type="date"
+                            placeholder={t('coupons.filters.expiredAfter')}
+                            value={expires_after || ''}
+                            onChange={(e) => setExpiresAfter(e.target.value)}
+                        />
+                        <Input
+                            type="date"
+                            placeholder={t('coupons.filters.expiredBefore')}
+                            value={expires_before || ''}
+                            onChange={(e) => setExpiresBefore(e.target.value)}
+                        />
+
+                    </div>
+
+                </div>
+
+
+
+                <div className="flex flex-col md:flex-row gap-2">
+                    <Input
+                        type="date"
+                        placeholder={t('coupons.filters.createdAfter')}
+                        value={created_after || ''}
+                        onChange={(e) => setCreatedAfter(e.target.value)}
+                    />
+                    <Input
+                        type="date"
+                        placeholder={t('coupons.filters.createdBefore')}
+                        value={created_before || ''}
+                        onChange={(e) => setCreatedBefore(e.target.value)}
+                    />
+                </div>
+
 
 
 
@@ -217,7 +239,6 @@ export const Coupons = () => {
                                 <div className="flex gap-2">
                                     <ButtonGroup >
                                         <Button variant="ghost" className="justify-start" onClick={() => { handleView(coupon) }}>{t('common.labels.view')}</Button>
-                                        <Button variant="ghost" className="justify-start" onClick={() => handleEdit(coupon)}>{t('roles.editRole')}</Button>
                                         <Button variant="ghost" className="justify-start w-full" onClick={() => handleChangeStatus(coupon.id, coupon.status === "active" ? "inactive" : "active")}>{t('common.labels.changeStatus')}</Button>
                                         <Button variant="destructive" className="justify-start" onClick={() => handleDelete(coupon)}>{t('common.labels.delete')}</Button>
                                     </ButtonGroup>

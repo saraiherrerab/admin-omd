@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../Button";
 import { Input } from "../Input";
-import { Select } from "../Select";
 import { TextArea } from "../TextArea";
-import { Label } from "../Label";
-import { LabelInput } from "../LabelInput";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -98,32 +95,28 @@ export const RoleForm = ({ onClose, onSuccess, roleToEdit }: RoleFormProps) => {
 
     const renderRoleContent = () => (
         <>
-            <LabelInput>
-                <Label htmlFor="name">{t('common.labels.name')}</Label>
-                <Input
-                    id="name"
-                    type="text"
-                    {...register("name")}
-                    placeholder={t('common.labels.name')}
-                />
-                {errors.name && <span className="text-red-500 text-xs">{errors.name.message}</span>}
-            </LabelInput>
 
-            <LabelInput>
-                <Label htmlFor="description">{t('common.labels.description')}</Label>
-                <TextArea
-                    id="description"
-                    {...register("description")}
-                    placeholder={t('common.labels.description')}
-                    rows={5}
-                />
-                {errors.description && <span className="text-red-500 text-xs">{errors.description.message}</span>}
-            </LabelInput>
+            <Input
+                id="name"
+                type="text"
+                {...register("name")}
+                placeholder={t('common.labels.name')}
+                className="w-full"
+            />
+            {errors.name && <span className="text-red-500 text-xs">{errors.name.message}</span>}
+
+            <TextArea
+                id="description"
+                {...register("description")}
+                placeholder={t('common.labels.description')}
+                rows={5}
+            />
+            {errors.description && <span className="text-red-500 text-xs">{errors.description.message}</span>}
 
 
 
             <div className="flex flex-col gap-2 mt-4">
-                <Label>{t('roles.permissions')}</Label>
+                <p className="text-sm font-medium text-gray-700">{t('roles.permissions')}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto p-2 border rounded-md">
                     {permissions.map((permission) => (
                         <div key={permission.id} className="flex items-center gap-2">
@@ -133,9 +126,9 @@ export const RoleForm = ({ onClose, onSuccess, roleToEdit }: RoleFormProps) => {
                                 checked={selectedPermissions.includes(permission.id)}
                                 onChange={() => handlePermissionChange(permission.id)}
                             />
-                            <Label htmlFor={`permission-${permission.id}`} className="text-sm cursor-pointer">
+                            <label htmlFor={`permission-${permission.id}`} className="text-sm cursor-pointer">
                                 {permission.name}
-                            </Label>
+                            </label>
                         </div>
                     ))}
                 </div>

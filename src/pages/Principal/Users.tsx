@@ -90,17 +90,16 @@ export const Users = () => {
                         />
                     </div> */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium">{t('common.labels.balance')}</label>
                         <Input
                             type="number"
-                            placeholder={t('common.placeholders.balance')}
+                            placeholder={t('common.labels.balance')}
                             value={balanceFilter}
                             onChange={(e) => setBalanceFilter(e.target.value)}
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium">{t('common.labels.role')}</label>
                         <Select
+                            label={t('common.labels.role')}
                             value={roleFilter}
                             onChange={(e) => setRoleFilter(e.target.value)}
                             options={[

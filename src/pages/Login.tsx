@@ -5,7 +5,6 @@ import { useAuth } from '@/context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
 import { Eye, EyeOff } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +12,7 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import { InputPassword } from '@/components/ui/InputPassword'
 
 export default function Login() {
   const { t } = useTranslation()
@@ -99,12 +99,11 @@ export default function Login() {
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-muted-foreground font-normal">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={t('auth.emailPlaceholder')}
-                className={`bg-muted/50 border-input ${errors.email ? 'border-destructive' : ''}`}
+                placeholder={t('auth.email')}
+                className={`bg-muted/50 border-input w-full ${errors.email ? 'border-destructive' : ''}`}
                 {...register('email')}
               />
               {errors.email && (
@@ -113,23 +112,17 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-muted-foreground font-normal">{t('auth.password')}</Label>
               <div className="relative">
-                <Input
+                <InputPassword
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder={t('auth.passwordPlaceholder')}
+                  placeholder={t('auth.password')}
                   className={`bg-muted/50 border-input pr-10 ${errors.password ? 'border-destructive' : ''}`}
                   {...register('password')}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </Button>
+
               </div>
               {errors.password && (
                 <p className="text-sm text-destructive">{errors.password.message}</p>

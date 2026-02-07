@@ -242,7 +242,9 @@
       "notRedeemed": "Not redeemed",
       "creator": "Creator",
       "pool": "Pool",
-      "returnable": "With return"
+      "returnable": "With return",
+      "notReturnable": "Without return",
+      "created_date": "Created date"
     },
     "headers": {
       "code": "Code",

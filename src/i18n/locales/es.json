@@ -248,7 +248,10 @@
       "notRedeemed": "No redimido",
       "creator": "Creador",
       "pool": "Pool",
-      "returnable": "Con retorno"
+      "returnable": "Con retorno",
+      "notReturnable": "Sin retorno",
+      "expiration_date": "Fecha de expiración",
+      "created_date": "Fecha de creación"
     },
     "headers": {
       "code": "Código",

@@ -4,7 +4,6 @@ import { useUsers } from "@/hooks/useUsers"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next";
 import { Button } from "../Button";
-import { Label } from "../Label";
 import { Spinner } from "../Spinner";
 
 interface AssignRolesFormProps {
@@ -66,9 +65,9 @@ export const AssignRolesForm = ({ userId, onClose }: AssignRolesFormProps) => {
                                 checked={selectedRoles.includes(role.id)}
                                 onChange={() => handleRoleChange(role.id)}
                             />
-                            <Label htmlFor={`role-${role.id}`} className="text-sm cursor-pointer">
+                            <label htmlFor={`role-${role.id}`} className="text-sm cursor-pointer">
                                 {role.name}
-                            </Label>
+                            </label>
                         </div>
                     ))}
                 </div>
