@@ -4,8 +4,7 @@ export type { Permission };
 export interface Role {
   id: number;
   name: string;
-  description: string;
-  hierarchy_level: number;
+  description: string; 
   status: string;
   permissions: Permission[];
   created_at: string;
@@ -14,13 +13,11 @@ export interface Role {
 export interface CreateRoleDTO {
   name: string;
   description: string;
-  hierarchy_level: number;
   permissions: number[]; // Array of permission IDs
 }
 
 export interface UpdateRoleDTO {
   name?: string;
   description?: string;
-    permissions?: number[]; 
-  hierarchy_level?: number;
+    permissions?: number[];   
 }

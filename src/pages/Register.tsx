@@ -4,7 +4,6 @@ import { useAuth } from '@/context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import logo from '@/assets/logo.png'
 import { useTranslation } from 'react-i18next'
@@ -97,7 +96,7 @@ export default function Register() {
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-muted-foreground font-normal">{t('auth.name')}</Label>
+              <label htmlFor="name" className="text-muted-foreground font-normal">{t('auth.name')}</label>
               <Input
                 id="name"
                 type="text"
@@ -111,7 +110,7 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-muted-foreground font-normal">{t('auth.email')}</Label>
+              <label htmlFor="email" className="text-muted-foreground font-normal">{t('auth.email')}</label>
               <Input
                 id="email"
                 type="email"
@@ -125,7 +124,7 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-muted-foreground font-normal">{t('auth.password')}</Label>
+              <label htmlFor="password" className="text-muted-foreground font-normal">{t('auth.password')}</label>
               <div className="relative">
                 <Input
                   id="password"
@@ -147,9 +146,9 @@ export default function Register() {
                 <p className="text-sm text-destructive">{errors.password.message}</p>
               )}
               {/* Keep the static help text only if there are no errors, or just let validation handle it?
-                  The original had it always visible. Yup handles it as error.
-                  I will remove the static help text to avoid duplication/clutter when error shows.
-              */}
+                    The original had it always visible. Yup handles it as error.
+                    I will remove the static help text to avoid duplication/clutter when error shows.
+                */}
               {!errors.password && (
                 <p className="text-xs text-muted-foreground">
                   {t('validation.passwordTooShort')}

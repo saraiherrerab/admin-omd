@@ -1,6 +1,5 @@
 import { Layout } from "@/components/Layout"
 import { useTranslation } from "react-i18next"
-import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { User } from "@/types/users";
 import { useUsers } from "@/hooks/useUsers";
@@ -16,6 +15,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { Dialog } from "@/components/ui/Dialog";
 import { UserView } from "@/components/ui/users/UserView";
 import { AssignRolesForm } from "@/components/ui/users/AssignRolesForm";
+import { TableCell } from "@/components/ui/TableCell";
 
 
 
@@ -40,7 +40,7 @@ export const Users = () => {
     */
     const [currentPage, setCurrentPage] = useState(1);
 
-    const PAGE_LIMIT = 5;
+    const PAGE_LIMIT = 10;
 
 
 
@@ -90,17 +90,16 @@ export const Users = () => {
                         />
                     </div> */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium">{t('common.labels.balance')}</label>
                         <Input
                             type="number"
-                            placeholder={t('common.placeholders.balance')}
+                            placeholder={t('common.labels.balance')}
                             value={balanceFilter}
                             onChange={(e) => setBalanceFilter(e.target.value)}
                         />
                     </div>
                     <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium">{t('common.labels.role')}</label>
                         <Select
+                            label={t('common.labels.role')}
                             value={roleFilter}
                             onChange={(e) => setRoleFilter(e.target.value)}
                             options={[
@@ -133,21 +132,14 @@ export const Users = () => {
                         >
                             {users.map((user: User) => (
                                 <tr key={user.id} className="block md:table-row bg-card mb-4 rounded-lg shadow-sm border p-4 md:p-0 md:mb-0 md:shadow-none md:border-b md:border-border md:bg-transparent">
-                                    <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
-                                        <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.name')}</span>
-                                        {user.name} {user.lastname}
-                                    </td>
+                                    <TableCell label={t('common.labels.name')}>{user.name} {user.lastname}</TableCell>
 
-                                    <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
-                                        <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.email')}</span>
-                                        {user.email}
-                                    </td>
+                                    <TableCell label={t('common.labels.email')}>{user.email}</TableCell>
 
 
-                                    <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
-                                        <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.state')}</span>
+                                    <TableCell label={t('common.labels.state')}>
                                         <Chip label={user.status} variant={user.status === 'active' ? 'default' : 'destructive'} />
-                                    </td>
+                                    </TableCell>
 
                                     <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
                                         <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.actions')}</span>

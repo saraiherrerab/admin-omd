@@ -1,10 +1,18 @@
 import { type ComponentProps, forwardRef } from "react"
 import { cn } from "@/lib/utils"
+import { Button } from "./Button"
+import { useState } from "react"
+import { Eye, EyeOff } from "lucide-react"
 
-const Input = forwardRef<HTMLInputElement, ComponentProps<"input">>(
-  ({ className, type, placeholder, ...props }, ref) => {
+interface InputProps extends ComponentProps<"input"> {
+  showPassword: boolean;
+  setShowPassword: (showPassword: boolean) => void;
+}
+
+const InputPassword = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, placeholder, showPassword, setShowPassword, ...props }, ref) => {
     return (
-      <div className={cn("w-fit", className)}>
+      <div className="w-full">
         <div className="relative group">
           <input
             type={type}
@@ -16,6 +24,16 @@ const Input = forwardRef<HTMLInputElement, ComponentProps<"input">>(
             ref={ref}
             {...props}
           />
+
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setShowPassword!(!showPassword!)}
+            className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </Button>
+
           <label
             htmlFor={props.id}
             className="absolute cursor-text bg-background px-1 left-2.5 top-2.5 text-muted-foreground text-sm transition-all duration-300 ease-in-out transform origin-left pointer-events-none
@@ -29,6 +47,6 @@ const Input = forwardRef<HTMLInputElement, ComponentProps<"input">>(
     )
   }
 )
-Input.displayName = "Input"
+InputPassword.displayName = "InputPassword"
 
-export { Input }
+export { InputPassword }

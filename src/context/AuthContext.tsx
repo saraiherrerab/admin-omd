@@ -8,15 +8,30 @@ import { toast } from 'react-toastify';
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  // Initialize user from localStorage to prevent flash of empty state
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   // const toast = useToast();
 
+  // Helper to update user and persist to localStorage
+  const updateUser = (userData: User | null) => {
+    setUser(userData);
+    if (userData) {
+      localStorage.setItem('user', JSON.stringify(userData));
+    } else {
+      localStorage.removeItem('user');
+    }
+  };
+
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
       if (storedToken) {
         try {
@@ -24,28 +39,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const isExpired = decoded.exp && decoded.exp * 1000 < Date.now();
 
           if (!isExpired) {
-            setUser({
-              id: decoded.id,
-              email: decoded.email,
-              name: decoded.name,
-              roles: decoded.roles || [],
-              // username: decoded.username || decoded.email,
-            });
-            setToken(storedToken);
+            // If we have stored user data, validate and use it
+            if (storedUser) {
+              const parsedUser = JSON.parse(storedUser);
+              // Validate that all required fields exist
+              if (parsedUser.id && parsedUser.email && parsedUser.name) {
+                setUser(parsedUser);
+                setToken(storedToken);
+              } else {
+                // Incomplete user data - clear and require re-login
+                console.log('Incomplete user data, clearing session');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                setToken(null);
+                setUser(null);
+              }
+            } else {
+              // No stored user data - require re-login to get full user info
+              console.log('No stored user data, clearing session');
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              setToken(null);
+              setUser(null);
+            }
           } else {
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
             setToken(null);
             setUser(null);
           }
         } catch (e) {
           console.error("Token corrupto");
           localStorage.removeItem('token');
+          localStorage.removeItem('user');
           setToken(null);
           setUser(null);
         }
       } else {
         setToken(null);
         setUser(null);
+        localStorage.removeItem('user');
       }
       setLoading(false);
     };
@@ -69,21 +102,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Decode token to get user info
         const decoded = jwtDecode<JWTPayload>(response.token);
-        // console.log(decoded)
-        setUser({
+        // Persist user data to localStorage
+        updateUser({
           id: decoded.id,
           email: response?.user?.email!,
           name: response?.user?.name!,
           roles: response?.user?.roles || [],
-          // username: response?.user?.username!,
         });
 
       } else if (response.user) {
         // If API returns user data directly (cookie-based auth)
-        setUser({
+        updateUser({
           id: Number(response.user.id),
           email: response.user.email,
-          // username: response.user.email, // Fallback
           name: response.user.name || '',
           roles: response.user.roles || []
         });
@@ -133,6 +164,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       // Always clear local state regardless of API call success
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       setToken(null);
       setUser(null);
     }

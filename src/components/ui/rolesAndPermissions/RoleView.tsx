@@ -13,7 +13,7 @@ export const RoleView = ({ onClose, roleToEdit }: RoleFormProps) => {
     const renderRoleContent = () => (
         <>
             <div className="flex flex-col gap-4 w-full">
-                {/*  only view name, description, hierarchy_level, permissions */}
+                {/*  only view name, description, permissions */}
                 <div className="flex flex-col gap-2">
                     <p className="text-lg font-bold">{t('common.labels.name')}</p>
                     <p>{roleToEdit?.name}</p>
@@ -21,10 +21,6 @@ export const RoleView = ({ onClose, roleToEdit }: RoleFormProps) => {
                 <div className="flex flex-col gap-2">
                     <p className="text-lg font-bold">{t('common.labels.description')}</p>
                     <p>{roleToEdit?.description}</p>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <p className="text-lg font-bold">{t('common.labels.hierarchy')}</p>
-                    <p>{roleToEdit?.hierarchy_level}</p>
                 </div>
                 <div className="flex flex-col gap-2">
                     <p className="text-lg font-bold">{t('common.labels.permissions')}</p>

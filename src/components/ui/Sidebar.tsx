@@ -127,7 +127,7 @@ export const Sidebar = ({
                 `}
             >
 
-                <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
+                <div className="flex items-center justify-between p-6 md:p-2 mb-0 border-b border-border shrink-0">
                     <span className="font-semibold text-lg">{t('common.menu')}</span>
 
                     <Button variant="ghost" size="sm" className="h-9 w-9 p-0 md:hidden" onClick={onClose}>
@@ -147,13 +147,13 @@ export const Sidebar = ({
                                         <Button
                                             variant="ghost"
                                             className={`w-full justify-between hover:bg-muted ${isExpanded ? 'bg-muted' : ''}`}
-                                            onClick={() => toggleSubmenu(item.path)}
+
                                         >
                                             <div className="flex items-center gap-2">
                                                 {renderIcon(item.path)}
                                                 <span>{t(item.title)}</span>
                                             </div>
-                                            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                                            <ChevronDown onClick={() => toggleSubmenu(item.path)} className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                                         </Button>
                                     ) : (
                                         <NavLink

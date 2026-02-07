@@ -111,6 +111,26 @@ export const useRoles = () => {
     }
   }, [getRoles]);
 
+  const changeStatus = useCallback(async (id: number, status: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.put(`/roles/${id}`, { status });
+      if (response.data.success) {
+        await getRoles(); // Refresh the list
+        return response.data.data;
+      } else {
+         throw new Error(response.data.message || 'Failed to change status');
+      }
+    } catch (err: any) {
+      console.error('Error changing status:', err);
+      setError(err.response?.data?.message || err.message || 'Error changing status');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [getRoles]);
+
   return {
     roles,
     loading,
@@ -119,6 +139,7 @@ export const useRoles = () => {
     getRole,
     createRole,
     updateRole,
-    deleteRole
+    deleteRole,
+    changeStatus
   };
 };

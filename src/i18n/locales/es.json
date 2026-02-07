@@ -14,6 +14,14 @@
     "logout": "Cerrar sesión",
     "menu": "Menú",
     "language": "Idioma",
+    "accept": "Aceptar",
+    "decline": "Declinar",
+    "generateCode": "Generar código",
+    "messages": {
+      "createSuccess": "Creado exitosamente",
+      "updateSuccess": "Actualizado exitosamente",
+      "deleteSuccess": "Eliminado exitosamente"
+    },
     "labels": {
       "name": "Nombre",
       "description": "Descripción",
@@ -161,6 +169,8 @@
     "noRolesFound": "No se encontraron roles.",
     "editRole": "Gestionar Permisos",
     "permissions": "Permisos",
+    "deleteRole": "Eliminar Rol",
+    "createRole": "Crear Rol",
     "roles_data": {
       "super_admin": {
         "name": "Super Administrador",
@@ -217,5 +227,56 @@
     "auditManagement": "Gestión de Auditorías",
     "auditManagementSubtitle": "Auditorías del Sistema",
     "noAuditsFound": "No se encontraron auditorías."
+  },
+  "coupons": {
+    "title": "Gestión de Cupones",
+    "subtitle": "Crear y administrar cupones de descuento",
+    "noCouponsFound": "No se encontraron cupones.",
+    "createCoupon": "Crear Cupón",
+    "editCoupon": "Editar Cupón",
+    "filters": {
+      "all": "Todos",
+      "active": "Activos",
+      "promo": "PROMO",
+      "used": "Usados",
+      "expiredAfter": "Expirado después de",
+      "expiredBefore": "Expirado antes de",
+      "createdAfter": "Creado después de",
+      "createdBefore": "Creado antes de",
+      "minAmount": "Monto mínimo",
+      "maxAmount": "Monto máximo",
+      "code": "Código",
+      "redeemedBy": "Redimido por",
+      "redeemed": "Redimido",
+      "notRedeemed": "No redimido",
+      "creator": "Creador",
+      "pool": "Pool",
+      "returnable": "Con retorno",
+      "notReturnable": "Sin retorno",
+      "expiration_date": "Fecha de expiración",
+      "created_date": "Fecha de creación"
+    },
+    "headers": {
+      "code": "Código",
+      "amount": "Monto",
+      "status": "Estado",
+      "expiration_date": "Fecha de expiración",
+      "redeemed_by": "Redimido por",
+      "with_return": "Con retorno",
+      "creator": "Creador",
+      "pool": "Pool"
+    },
+    "labels": {
+      "amount": "Monto",
+      "code": "Código",
+      "expirationRange": "Rango de expiración",
+      "expirationMin": "Activo desde",
+      "expirationMax": "Activo hasta",
+      "redeemed_by": "Redimido por",
+      "with_return": "Con retorno",
+      "creator": "Creador",
+      "pool": "Pool",
+      "currency": "Moneda"
+    }
   }
 }

@@ -14,12 +14,14 @@
     "logout": "Logout",
     "menu": "Menu",
     "language": "Language",
+    "accept": "Accept",
+    "decline": "Decline",
+    "generateCode": "Generate code",
     "labels": {
       "name": "Name",
       "description": "Description",
       "status_active": "Active",
       "status_inactive": "Inactive",
-      "hierarchy": "Hierarchy",
       "classification": "Classification",
       "permissions": "Permissions",
       "created": "Created",
@@ -156,6 +158,13 @@
     "noRolesFound": "No roles found.",
     "editRole": "Manage Permissions",
     "permissions": "Permissions",
+    "deleteRole": "Delete Role",
+    "createRole": "Create Role",
+    "messages": {
+      "createSuccess": "Role created successfully",
+      "updateSuccess": "Role updated successfully",
+      "deleteSuccess": "Role deleted successfully"
+    },
     "roles_data": {
       "super_admin": {
         "name": "Super Administrator",
@@ -212,5 +221,55 @@
     "auditManagement": "Audit Management",
     "auditManagementSubtitle": "System Audits",
     "noAuditsFound": "No audits found."
+  },
+  "coupons": {
+    "title": "Coupon Management",
+    "subtitle": "Create and manage discount coupons",
+    "noCouponsFound": "No coupons found.",
+    "createCoupon": "Create Coupon",
+    "editCoupon": "Edit Coupon",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "promo": "PROMO",
+      "used": "Used",
+      "expiredAfter": "Expired after",
+      "expiredBefore": "Expired before",
+      "createdAfter": "Created after",
+      "createdBefore": "Created before",
+      "minAmount": "Minimum amount",
+      "maxAmount": "Maximum amount",
+      "code": "Code",
+      "redeemedBy": "Redeemed by",
+      "redeemed": "Redeemed",
+      "notRedeemed": "Not redeemed",
+      "creator": "Creator",
+      "pool": "Pool",
+      "returnable": "With return",
+      "notReturnable": "Without return",
+      "created_date": "Created date"
+    },
+    "headers": {
+      "code": "Code",
+      "amount": "Amount",
+      "status": "Status",
+      "expiration_date": "Expiration date",
+      "redeemed_by": "Redeemed by",
+      "with_return": "With return",
+      "creator": "Creator",
+      "pool": "Pool"
+    },
+    "labels": {
+      "amount": "Amount",
+      "code": "Code",
+      "expirationRange": "Expiration range",
+      "expirationMin": "Expiration min",
+      "expirationMax": "Expiration max",
+      "redeemed_by": "Redeemed by",
+      "with_return": "With return",
+      "creator": "Creator",
+      "pool": "Pool",
+      "currency": "Currency"
+    }
   }
 }
