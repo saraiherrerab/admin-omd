@@ -1,5 +1,5 @@
 import { ClipboardCheck, Copy } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const CopyTextComponent = ({ textToCopy }: { textToCopy: string }) => {
     const [isCopied, setIsCopied] = useState(false);

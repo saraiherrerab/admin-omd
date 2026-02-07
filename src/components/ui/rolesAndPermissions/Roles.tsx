@@ -126,7 +126,7 @@ export const Roles = () => {
 
             {/* Dialog only for view */}
             <Dialog open={openViewDialog} onClose={handleCloseView}>
-                <RoleView onClose={handleCloseView} roleToEdit={roleToView} />
+                <RoleView roleToEdit={roleToView} />
             </Dialog>
 
             {/* Dialog for delete confirmation */}

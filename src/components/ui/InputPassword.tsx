@@ -1,7 +1,6 @@
 import { type ComponentProps, forwardRef } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "./Button"
-import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 
 interface InputProps extends ComponentProps<"input"> {

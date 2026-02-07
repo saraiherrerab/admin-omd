@@ -1,9 +1,5 @@
 import type { Coupon } from "@/types/coupons";
 import { useTranslation } from "react-i18next";
-import { useCoupons } from "@/hooks/useCoupons";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useForm } from "react-hook-form";
 import { useUsers } from "@/hooks/useUsers";
 import { useEffect, useState } from "react";
 import { Button } from "../Button";
@@ -16,21 +12,21 @@ interface CouponFormProps {
     onClose: () => void;
 }
 
-const schema = yup.object().shape({
+// const schema = yup.object().shape({
 
-    code: yup.string().required('Código es requerido'),
-    amount: yup.number().required('Monto es requerido'),
-    user_id: yup.number().required('Usuario es requerido'),
-    promotion_id: yup.number().optional(),
-    returnable: yup.boolean().optional(),
-    expires_at: yup.date().optional(),
-});
+//     code: yup.string().required('Código es requerido'),
+//     amount: yup.number().required('Monto es requerido'),
+//     user_id: yup.number().required('Usuario es requerido'),
+//     promotion_id: yup.number().optional(),
+//     returnable: yup.boolean().optional(),
+//     expires_at: yup.date().optional(),
+// });
 
-type FormData = yup.InferType<typeof schema>;
+//type FormData = yup.InferType<typeof schema>;
 
 export const CouponForm = ({ coupon, onClose }: CouponFormProps) => {
     const { t } = useTranslation();
-    const { createCoupon } = useCoupons();
+    //const { createCoupon } = useCoupons();
     const { users, getUsers } = useUsers();
     const [code, setCode] = useState('');
     const [amount, setAmount] = useState(0);
@@ -73,8 +69,7 @@ export const CouponForm = ({ coupon, onClose }: CouponFormProps) => {
     //  });
 
     const onSubmit = () => {
-        // createCoupon(coupon);
-        //onClose();
+        onClose();
     };
     const handleGenerateCode = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();

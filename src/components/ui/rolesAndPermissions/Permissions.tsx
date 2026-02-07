@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next"
 import { useEffect, useMemo } from "react";
-import { Table } from "../Table";
 import { Spinner } from "../Spinner";
 import { usePermissions } from "@/hooks/usePermissions";
 import type { Permission } from "@/types/roles";

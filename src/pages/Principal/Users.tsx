@@ -21,7 +21,7 @@ import { TableCell } from "@/components/ui/TableCell";
 
 export const Users = () => {
     const { t } = useTranslation();
-    const { users, getUsers, loading, error, pagination, getUser } = useUsers();
+    const { users, getUsers, loading, error, pagination } = useUsers();
 
     const { getRoles, roles } = useRoles();
     const [openDialog, setOpenDialog] = useState(false);

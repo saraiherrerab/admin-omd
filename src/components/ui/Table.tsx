@@ -1,5 +1,3 @@
-import { Button } from "./Button";
-
 interface TableProps {
     title?: string;
     subtitle?: string;

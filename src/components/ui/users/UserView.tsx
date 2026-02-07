@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import type { User } from "@/types/users";
 import { useUsers } from "@/hooks/useUsers";
 import { useEffect } from "react";
 import { Spinner } from "../Spinner";

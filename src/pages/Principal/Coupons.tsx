@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout"
 import { Dialog } from "@/components/ui/Dialog"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useCoupons } from "@/hooks/useCoupons";
 import { Table } from "@/components/ui/Table"
@@ -50,9 +50,7 @@ export const Coupons = () => {
         });
     }, [getCoupons, currentPage, appliedFilters]);
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+
 
     const handleApplyFilters = () => {
         const filters = {
@@ -251,6 +249,7 @@ export const Coupons = () => {
                                 <div className="flex gap-2">
                                     <ButtonGroup >
                                         <Button variant="ghost" className="justify-start" onClick={() => { handleView(coupon) }}>{t('common.labels.view')}</Button>
+                                        <Button variant="ghost" className="justify-start" onClick={() => { handleEdit(coupon) }}>{t('common.labels.edit')}</Button>
                                         <Button variant="ghost" className="justify-start w-full" onClick={() => handleChangeStatus(coupon.id, coupon.status === "active" ? "inactive" : "active")}>{t('common.labels.changeStatus')}</Button>
                                         <Button variant="destructive" className="justify-start" onClick={() => handleDelete(coupon)}>{t('common.labels.delete')}</Button>
                                     </ButtonGroup>

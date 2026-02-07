@@ -3,11 +3,10 @@ import type { Role } from "@/types/roles";
 
 
 interface RoleFormProps {
-    onClose: () => void;
     roleToEdit?: Role | null;
 }
 
-export const RoleView = ({ onClose, roleToEdit }: RoleFormProps) => {
+export const RoleView = ({ roleToEdit }: RoleFormProps) => {
     const { t } = useTranslation();
 
     const renderRoleContent = () => (

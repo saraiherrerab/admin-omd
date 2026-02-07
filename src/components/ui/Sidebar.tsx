@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from "@/context/AuthContext";
-import { ChevronDown, Database, Gift, Headset, Home, Layers, Layers2, LogOut, Mail, Wallet, X } from "lucide-react";
+import { ChevronDown, Database, Gift, Headset, Home, Layers, LogOut, Mail, Wallet, X } from "lucide-react";
 import { Button } from "./Button";
 import { LanguageSelectorDropdown } from "./LanguageSelectorDropdown";
 import { useLanguage } from "@/hooks/useLanguage";
