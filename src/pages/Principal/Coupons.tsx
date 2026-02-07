@@ -13,6 +13,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Pagination } from "@/components/ui/Pagination";
+import { Plus } from "lucide-react";
 
 
 export const Coupons = () => {
@@ -98,6 +99,7 @@ export const Coupons = () => {
     }
 
 
+
     return (
         <Layout>
             <div className="flex justify-between items-center mb-6">
@@ -105,6 +107,9 @@ export const Coupons = () => {
                     <h1 className="text-2xl font-bold">{t('coupons.title')}</h1>
                     <p className="text-muted-foreground">{t('coupons.subtitle')}</p>
                 </div>
+                <Button variant="primary" onClick={() => setOpen(true)} className="flex items-center gap-2">
+                    <Plus size={20} />{t('common.labels.create')}
+                </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-card p-4 rounded-lg border">

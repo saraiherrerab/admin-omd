@@ -10,6 +10,7 @@ export interface Coupon {
     updated_by: number;
     created_by: number;
     pool: string;
+    token: string;
     with_return: boolean;
     status: string;
     creator: {
@@ -29,6 +30,7 @@ export interface CouponFilters {
     page?: number;
     limit?: number;
     code?: string;
+    token?: string;
     is_redeemed?: boolean;
     redeemed_by?: number;
     min_amount?: number;
@@ -37,4 +39,26 @@ export interface CouponFilters {
     expires_before?: Date;
     created_after?: Date;
     created_before?: Date; 
+}
+
+export interface CreateCouponDTO {
+    code: string;
+    amount: number;
+    is_redeemed?: boolean;
+    redeemed_by?: number;
+    expiration_date?: Date;
+    pool: string;
+    token: string;
+    with_return: boolean;
+    status: string;
+    creator: {
+        id: number;
+        email: string;
+        username: string;
+    };
+    assigned_user?: {
+        id: number;
+        email: string;
+        username: string;
+    };
 }

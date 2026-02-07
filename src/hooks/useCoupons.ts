@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import api from '../services/api';
-import type  { Coupon, CouponFilters } from '../types/coupons';
+import type  { Coupon, CouponFilters, CreateCouponDTO } from '../types/coupons';
 
 export const useCoupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -57,6 +57,42 @@ export const useCoupons = () => {
     }
   }, []);
 
+  const deleteCoupon = useCallback(async (id: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.delete(`/coupons/${id}`);
+      if (response.data.success) {
+        return response.data.data;
+      }
+      return null;
+    } catch (err: any) {
+      console.error(`Error deleting role ${id}:`, err);
+      setError(err.response?.data?.message || err.message || 'Error deleting role');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createCoupon = useCallback(async (coupon: CreateCouponDTO) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.post(`/coupons`, coupon);
+      if (response.data.success) {
+        return response.data.data;
+      }
+      return null;
+    } catch (err: any) {
+      console.error(`Error creating role:`, err);
+      setError(err.response?.data?.message || err.message || 'Error creating role');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
 
   return {
     coupons,
@@ -65,5 +101,7 @@ export const useCoupons = () => {
     getCoupons,
     getCoupon,
     pagination,
+    deleteCoupon,
+    createCoupon,
   };
 };
