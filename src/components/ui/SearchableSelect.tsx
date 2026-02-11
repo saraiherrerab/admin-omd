@@ -1,7 +1,6 @@
-import { type ComponentProps, forwardRef, useState, useRef, useEffect, useCallback } from "react";
-import { cn } from "@/lib/utils";
+import { type ComponentProps, forwardRef, useState, useEffect } from "react";
 import { Button } from "./Button";
-import { ChevronDown, Loader2, Trash, X } from "lucide-react"; // Added a loader icon
+import { Loader2, X } from "lucide-react"; // Added a loader icon
 import { Input } from "./Input";
 
 interface AsyncSelectProps extends Omit<ComponentProps<"div">, 'onChange'> {
@@ -14,9 +13,8 @@ interface AsyncSelectProps extends Omit<ComponentProps<"div">, 'onChange'> {
 }
 
 export const SearchableSelect = forwardRef<HTMLDivElement, AsyncSelectProps>(
-    ({ options, label, value, onChange, onSearchChange, isLoading, className, ...props }, ref) => {
+    ({ options, label, onChange, onSearchChange, isLoading }) => {
         const [search, setSearch] = useState("");
-        const containerRef = useRef<HTMLDivElement>(null);
         const [selectedOption, setSelectedOption] = useState(null);
 
         // Debounce logic: wait 300ms after user stops typing to call the API

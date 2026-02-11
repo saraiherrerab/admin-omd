@@ -1,15 +1,14 @@
 import { useCoupons } from "@/hooks/useCoupons";
-import type { Coupon } from "@/types/coupons";
 import { useEffect } from "react";
 import { Spinner } from "../Spinner";
 import { useTranslation } from "react-i18next";
 
 interface CouponViewProps {
     id: number;
-    onClose: () => void;
+    //    onClose: () => void;
 }
 
-export const CouponView = ({ id, onClose }: CouponViewProps) => {
+export const CouponView = ({ id }: CouponViewProps) => {
     const { getCoupon, loading, error, coupon } = useCoupons();
     const { t } = useTranslation();
 

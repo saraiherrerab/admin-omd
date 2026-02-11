@@ -28,7 +28,6 @@ export const Coupons = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [couponToDelete, setCouponToDelete] = useState<Coupon | null>(null);
     const [couponToEdit, setCouponToEdit] = useState<Coupon | null>(null);
-    const [openEditDialog, setOpenEditDialog] = useState(false);
 
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -89,9 +88,9 @@ export const Coupons = () => {
         setOpen(true);
     }
 
-    const handleChangeStatus = (id: number, status: string) => {
-        console.log(id, status);
-    }
+    // const handleChangeStatus = (id: number, status: string) => {
+    //     console.log(id, status);
+    // }
 
     const handleDelete = (coupon: Coupon) => {
         // console.log(coupon);
@@ -295,7 +294,7 @@ export const Coupons = () => {
             )}
             {couponView && (
                 <Dialog open={openView} onClose={() => setOpenView(false)} >
-                    <CouponView id={couponView.id} onClose={() => setOpenView(false)} />
+                    <CouponView id={couponView.id} />
                 </Dialog>
             )}
 
