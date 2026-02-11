@@ -13,6 +13,9 @@ export interface Coupon {
     token: string;
     with_return: boolean;
     status: string;
+    promotion_id: number;
+    start_date: Date;
+    
     creator: {
         id: number;
         email: string;

@@ -49,10 +49,7 @@ const schema = yup.object().shape({
     }),
     is_redeemed: yup.boolean().optional(),
     status: yup.string().optional(),
-    start_date: yup.string().optional().test('is-valid-date', 'Fecha debe ser en el futuro', function (value) {
-        if (!value) return true;
-        return new Date(value) > new Date();
-    }),
+    start_date: yup.string().optional(),
     expiration_date: yup.string().optional().test('is-after-start', 'Fecha de expiración debe ser mayor a la fecha de inicio', function (value) {
         const { start_date } = this.parent;
         if (!value || !start_date) return true;
@@ -65,7 +62,9 @@ type CreateCouponInputs = yup.InferType<typeof schema>;
 
 export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
     const { t } = useTranslation();
-    const { createCoupon } = useCoupons();
+    const { createCoupon, updateCoupon } = useCoupons();
+    const isEditing = !!coupon;
+
     const [code, setCode] = useState('');
     const [amount, setAmount] = useState(0);
     const [pool, setPool] = useState("");
@@ -86,7 +85,7 @@ export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
     const poolOptions = [
         "",
         "usdt",
-        "omd",
+        "omdb",
         "omd3"
     ];
 
@@ -105,6 +104,18 @@ export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
         { id: "5", name: "Promo 5" },
         { id: "6", name: "Promo 6" },
     ];
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors }
+    } = useForm<CreateCouponInputs>({
+        defaultValues: initialData,
+        resolver: yupResolver(schema) as unknown as Resolver<CreateCouponInputs>,
+    });
+
+    // Fetch users for SearchableSelect
     useEffect(() => {
         const controller = new AbortController();
 
@@ -125,20 +136,43 @@ export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
 
         fetchUsers();
 
-        // 2. Cleanup function cancels the previous request
         return () => controller.abort();
     }, [searchTerm]);
 
+    // Populate form when editing
+    useEffect(() => {
+        if (coupon) {
+            // Set react-hook-form values
+            setValue("code", coupon.code);
+            setValue("amount", coupon.amount);
+            setValue("user_id", coupon.assigned_user?.id ?? 0);
+            setValue("promotion_id", coupon.promotion_id);
+            setValue("with_return", coupon.with_return);
+            setValue("pool", coupon.pool);
+            setValue("token", coupon.token);
+            setValue("is_redeemed", coupon.is_redeemed);
+            setValue("status", coupon.status);
+            if (coupon.start_date) {
+                const sd = new Date(coupon.start_date).toISOString().split('T')[0];
+                setValue("start_date", sd);
+                setStartDate(sd);
+            }
+            if (coupon.expiration_date) {
+                const ed = new Date(coupon.expiration_date).toISOString().split('T')[0];
+                setValue("expiration_date", ed);
+                setExpirationDate(ed);
+            }
 
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        formState: { errors }
-    } = useForm<CreateCouponInputs>({
-        defaultValues: initialData,
-        resolver: yupResolver(schema) as unknown as Resolver<CreateCouponInputs>,
-    });
+            // Also sync local state for controlled inputs
+            setCode(coupon.code);
+            setAmount(coupon.amount);
+            setPool(coupon.pool);
+            setCurrency(coupon.token);
+            setUser(coupon.assigned_user?.id?.toString() ?? "");
+            setPromotion(coupon.promotion_id?.toString() ?? "");
+        }
+    }, [coupon, setValue]);
+
     const onSubmit = async (data: CreateCouponInputs) => {
         console.log(data);
         // transform date to string 2026-12-04T16:36:00Z    
@@ -162,7 +196,17 @@ export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
         if (data.pool === "usdt") {
             data.token = "usdt";
         }
-        const response = await createCoupon(data);
+        if (data.pool === "omdb") {
+            data.token = "omdb";
+        }
+
+        let response;
+        if (isEditing) {
+            response = await updateCoupon(coupon.id, data);
+        } else {
+            response = await createCoupon(data);
+        }
+
         if (response) {
             onSuccess?.();
             onClose();
@@ -181,7 +225,7 @@ export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
 
     return (
         <div className="flex flex-col gap-4 w-full">
-            <h2 className="text-xl font-bold">{coupon ? t('coupons.editCoupon') : t('coupons.createCoupon')}</h2>
+            <h2 className="text-xl font-bold">{isEditing ? t('coupons.editCoupon') : t('coupons.createCoupon')}</h2>
             <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit(onSubmit, onError)}>
 
 
@@ -190,14 +234,17 @@ export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
                         placeholder={t('coupons.labels.code')}
                         className="w-full"
                         type="text"
-                        autoFocus
+                        autoFocus={!isEditing}
                         value={code}
+                        disabled={isEditing}
                         {...register('code', { onChange: (e) => setCode(String(e.target.value).toUpperCase()) })}
                         errors={errors.code?.message}
                     />
-                    <Button variant="outline" className="w-full" onClick={handleGenerateCode}>
-                        {t('common.generateCode')}
-                    </Button>
+                    {!isEditing && (
+                        <Button variant="outline" className="w-full" onClick={handleGenerateCode}>
+                            {t('common.generateCode')}
+                        </Button>
+                    )}
                 </div>
 
                 <Input

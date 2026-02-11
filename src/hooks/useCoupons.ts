@@ -101,6 +101,27 @@ export const useCoupons = () => {
   }, []);
 
 
+  const updateCoupon = useCallback(async (id: number, coupon: CreateCouponDTO) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await api.put(`/coupons/${id}`, coupon);
+      if (response.data.success) {
+        setCoupons((prev) =>
+          prev.map((c) => (c.id === id ? response.data.data : c))
+        );
+        return response;
+      }
+      return null;
+    } catch (err: any) {
+      console.error(`Error updating coupon:`, err);
+      setError(err.response?.data?.message || err.message || 'Error updating coupon');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     coupons,
     coupon,
@@ -111,5 +132,6 @@ export const useCoupons = () => {
     pagination,
     deleteCoupon,
     createCoupon,
+    updateCoupon,
   };
 };

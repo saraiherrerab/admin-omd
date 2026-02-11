@@ -27,6 +27,8 @@ export const Coupons = () => {
     const { coupons, getCoupons, loading, error, pagination, deleteCoupon } = useCoupons();
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [couponToDelete, setCouponToDelete] = useState<Coupon | null>(null);
+    const [couponToEdit, setCouponToEdit] = useState<Coupon | null>(null);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
 
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -83,6 +85,8 @@ export const Coupons = () => {
 
     const handleEdit = (coupon: Coupon) => {
         console.log(coupon);
+        setCouponToEdit(coupon);
+        setOpen(true);
     }
 
     const handleChangeStatus = (id: number, status: string) => {
@@ -298,6 +302,7 @@ export const Coupons = () => {
             <Dialog open={open} onClose={() => setOpen(false)} >
                 <CouponForm
                     onClose={() => setOpen(false)}
+                    coupon={couponToEdit ? couponToEdit : undefined}
                     onSuccess={() => getCoupons({ page: currentPage, limit: PAGE_LIMIT, ...appliedFilters })}
                 />
             </Dialog>
