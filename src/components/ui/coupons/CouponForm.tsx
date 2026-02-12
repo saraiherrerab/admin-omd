@@ -279,7 +279,7 @@ export const CouponForm = ({ coupon, onClose, onSuccess }: CouponFormProps) => {
                     />
                 )}
                 <SearchableSelect
-                    label={t('coupons.labels.user')}
+                    label={t('coupons.labels.redeemed_by')}
                     className="w-full"
                     value={user}
                     options={usersToAssign.map((user) => ({ value: user.id, label: user.name }))}
