@@ -8,7 +8,7 @@ export default function Home() {
       <h1>Home</h1>
       <p>Bienvenido {user?.name}</p>
       {/* <p>Tu rol es: {user?.roles[0].id}</p> */}
-      <p>Tus permisos son: {user?.permissions.map(p => p.name).join(', ')}</p>
+      {/* <p>Tus permisos son: {user?.permissions.map(p => p.name).join(', ')}</p> */}
     </Layout>
   )
 }
