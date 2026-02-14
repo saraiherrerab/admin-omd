@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setToken(storedToken);
               } else {
                 // Incomplete user data - clear and require re-login
-                console.log('Incomplete user data, clearing session');
+                //     console.log('Incomplete user data, clearing session');
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 setToken(null);
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
             } else {
               // No stored user data - require re-login to get full user info
-              console.log('No stored user data, clearing session');
+              //   console.log('No stored user data, clearing session');
               localStorage.removeItem('token');
               localStorage.removeItem('user');
               setToken(null);
@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.token) {
         localStorage.setItem('token', response.token);
         setToken(response.token);
-        console.log(response);
+        //  console.log(response);
         // Decode token to get user info
         const decoded = jwtDecode<JWTPayload>(response.token);
         // Persist user data to localStorage
@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
     } catch (error: any) {
-      console.error('Login error:', error);
+      // console.error('Login error:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Login failed';
       throw new Error(errorMessage);
     }
@@ -179,7 +179,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const updatedRoles = user.roles.map(role =>
       role.id === roleId ? { ...role, permissions: newPermissions } : role
     );
-    console.log(updatedRoles);
+    //console.log(updatedRoles);
     window.location.reload();
 
     const updatedUser = { ...user, roles: updatedRoles };

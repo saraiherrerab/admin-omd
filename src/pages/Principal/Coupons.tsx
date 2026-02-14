@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout"
 import { Dialog } from "@/components/ui/Dialog"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useCoupons } from "@/hooks/useCoupons";
 import { Table } from "@/components/ui/Table"
@@ -18,19 +18,45 @@ import { CouponForm } from "@/components/ui/coupons/CouponForm";
 import { CouponView } from "@/components/ui/coupons/CouponView";
 import { DeletePrompt } from "@/components/ui/DeletePrompt";
 import { useUser } from "@/hooks/useUser";
+import { pools } from "@/types/coupons";
+import { useUsers } from "@/hooks/useUsers";
+import { SearchableSelect } from "@/components/ui/SearchableSelect";
 
-
+/**
+ * TODO: Usar getCoupons en lugar de specialGetCoupons
+ * @returns 
+ */
 export const Coupons = () => {
     const { t } = useTranslation();
     const [open, setOpen] = useState(false)
     const [openView, setOpenView] = useState(false);
     const [couponView, setCouponView] = useState<Coupon | null>(null);
-    const { coupons, getCoupons, loading, error, pagination, deleteCoupon } = useCoupons();
+    const {
+
+        getCoupons,
+        loading: couponsLoading,
+        error: couponsError,
+        pagination,
+        deleteCoupon, specialGetCoupons, specialCoupons
+    } = useCoupons();
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [couponToDelete, setCouponToDelete] = useState<Coupon | null>(null);
     const [couponToEdit, setCouponToEdit] = useState<Coupon | null>(null);
     const { user } = useUser();
     const userPermissions = user?.permissions?.map((permission) => permission.name);
+
+    // Separate users hooks for the two search fields
+    const { getUsers: getRedeemedUsers, users: redeemedUsers, loading: redeemedUsersLoading } = useUsers();
+    const { getUsers: getAssignedUsers, users: assignedUsers, loading: assignedUsersLoading } = useUsers();
+
+    const [redeemedSearchTerm, setRedeemedSearchTerm] = useState("");
+    const [assignedSearchTerm, setAssignedSearchTerm] = useState("");
+
+    // Initial load for users
+    useEffect(() => {
+        getRedeemedUsers({ page: 1, limit: 100 });
+        getAssignedUsers({ page: 1, limit: 100 });
+    }, [getRedeemedUsers, getAssignedUsers]);
 
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -42,43 +68,73 @@ export const Coupons = () => {
     const [code, setCode] = useState('');
     const [is_redeemed, setIsRedeemed] = useState<boolean | undefined>(undefined);
     const [redeemed_by, setRedeemedBy] = useState<number | undefined>(undefined);
-    const [min_amount, setMinAmount] = useState<number | undefined>(undefined);
-    const [max_amount, setMaxAmount] = useState<number | undefined>(undefined);
-    const [expires_after, setExpiresAfter] = useState<string | undefined>(undefined);
-    const [expires_before, setExpiresBefore] = useState<string | undefined>(undefined);
-    const [created_after, setCreatedAfter] = useState<string | undefined>(undefined);
-    const [created_before, setCreatedBefore] = useState<string | undefined>(undefined);
+    const [assigned_to, setAssignedTo] = useState<number | undefined>(undefined);
     const [returnable, setReturnable] = useState<boolean | undefined>(undefined);
     const [pool, setPool] = useState<string>('');
+    const [token, setToken] = useState<string>('');
     const [appliedFilters, setAppliedFilters] = useState<any>({});
 
+    function useDebouncedValue<T>(value: T, delay = 300) {
+        const [debounced, setDebounced] = useState(value);
+
+        useEffect(() => {
+            const id = setTimeout(() => setDebounced(value), delay);
+            return () => clearTimeout(id);
+        }, [value, delay]);
+
+        return debounced;
+    }
+
+    const rawFilters = {
+        code: code.trim(),
+        is_redeemed,
+        redeemed_by,
+        assigned_to,
+        returnable,
+        pool,
+        token: token.trim(),
+    };
+
+    const cleanedFilters = useMemo(
+        () =>
+            Object.fromEntries(
+                Object.entries(rawFilters).filter(([, v]) => v !== "" && v !== undefined && v !== null)
+            ),
+        [code, is_redeemed, redeemed_by, assigned_to, returnable, pool, token]
+    );
+
+    const debouncedFilters = useDebouncedValue(cleanedFilters, 300);
+
+
     useEffect(() => {
-        getCoupons({
+        setCurrentPage(1);
+    }, [debouncedFilters]);
+
+    // Provisional para buscar cupones en la base de datos de VPS porque el backend local no tiene esta parte correcta, se deberia usar getCoupons
+    useEffect(() => {
+        specialGetCoupons({
+            ...debouncedFilters,
             page: currentPage,
             limit: PAGE_LIMIT,
-            ...appliedFilters
         });
-    }, [getCoupons, currentPage, appliedFilters]);
+    }, [specialGetCoupons, currentPage, debouncedFilters]);
 
+    useEffect(() => {
+        if (redeemedSearchTerm) {
+            getRedeemedUsers({ name: redeemedSearchTerm });
+        } else {
+            getRedeemedUsers({ page: 1, limit: 100 });
+        }
+    }, [redeemedSearchTerm, getRedeemedUsers]);
 
+    useEffect(() => {
+        if (assignedSearchTerm) {
+            getAssignedUsers({ name: assignedSearchTerm });
+        } else {
+            getAssignedUsers({ page: 1, limit: 100 });
+        }
+    }, [assignedSearchTerm, getAssignedUsers]);
 
-    const handleApplyFilters = () => {
-        const filters = {
-            code,
-            is_redeemed,
-            redeemed_by,
-            min_amount,
-            max_amount,
-            expires_after: expires_after ? new Date(expires_after) : undefined,
-            expires_before: expires_before ? new Date(expires_before) : undefined,
-            created_after: created_after ? new Date(created_after) : undefined,
-            created_before: created_before ? new Date(created_before) : undefined,
-            returnable,
-            pool,
-        };
-        setAppliedFilters(filters);
-        setCurrentPage(1);
-    };
 
     const handleView = (coupon: Coupon) => {
         setCouponView(coupon);
@@ -102,23 +158,53 @@ export const Coupons = () => {
 
     }
 
+    const cleanFilters = (obj: Record<string, any>) =>
+        Object.fromEntries(
+            Object.entries(obj).filter(([, v]) => v !== "" && v !== undefined && v !== null)
+        );
+
+    const handleApplyFilters = () => {
+        const filters = cleanFilters({
+            code: code.trim(),
+            is_redeemed,
+            redeemed_by,
+            assigned_to,
+            returnable,
+            pool,
+            token: token.trim(),
+        });
+
+        setCurrentPage(1);
+        setAppliedFilters(filters);
+    };
+
     const handleReset = () => {
         setCurrentPage(1);
         setCode('');
         setIsRedeemed(undefined);
         setRedeemedBy(undefined);
-        setMinAmount(undefined);
-        setMaxAmount(undefined);
-        setExpiresAfter(undefined);
-        setExpiresBefore(undefined);
-        setCreatedAfter(undefined);
-        setCreatedBefore(undefined);
         setPool('');
         setReturnable(undefined);
+        setAssignedTo(undefined);
+        setRedeemedSearchTerm('');
+        setAssignedSearchTerm('');
+        setToken('');
         setAppliedFilters({});
     }
 
+    // Search users for Redeemed By
+    useEffect(() => {
+        if (redeemedSearchTerm) {
+            getRedeemedUsers({ name: redeemedSearchTerm });
+        }
+    }, [redeemedSearchTerm, getRedeemedUsers]);
 
+    // Search users for Assigned To
+    useEffect(() => {
+        if (assignedSearchTerm) {
+            getAssignedUsers({ name: assignedSearchTerm });
+        }
+    }, [assignedSearchTerm, getAssignedUsers]);
 
     return (
         <Layout>
@@ -142,16 +228,19 @@ export const Coupons = () => {
                             placeholder={t('coupons.filters.code')}
                             className="w-full md:w-auto"
                             value={code}
-                            onChange={(e) => setCode(e.target.value)}
+                            onChange={(e) => setCode(String(e.target.value).toUpperCase())}
                         />
 
 
-                        <Input
-                            type="text"
-                            placeholder={t('coupons.filters.pool')}
+                        <Select
+                            label={t('coupons.filters.pool')}
                             className="w-full md:w-auto"
                             value={pool}
                             onChange={(e) => setPool(e.target.value)}
+                            options={[
+                                { value: '', label: t('coupons.filters.all') },
+                                ...pools.map(pool => ({ value: pool, label: pool }))
+                            ]}
                         />
 
 
@@ -167,13 +256,27 @@ export const Coupons = () => {
                             onChange={(e) => setIsRedeemed(e.target.value === '' ? undefined : e.target.value === 'true')}
                         />
 
-                        <Input
-                            type="text"
-                            placeholder={t('coupons.filters.redeemedBy')}
-                            className="w-full md:w-auto"
-                            value={redeemed_by || ''}
-                            onChange={(e) => setRedeemedBy(e.target.value ? parseInt(e.target.value) : undefined)}
-                        />
+                        <div className="flex flex-col md:flex-row gap-5">
+                            <SearchableSelect
+                                label={t('coupons.filters.redeemedBy')}
+                                value={redeemed_by}
+                                options={redeemedUsers.map((user) => ({ value: user.id, label: user.name }))}
+                                onChange={setRedeemedBy}
+                                onSearchChange={setRedeemedSearchTerm}
+                                isLoading={redeemedUsersLoading}
+                            />
+
+                            <SearchableSelect
+                                label={t('coupons.filters.assignedTo')}
+                                value={assigned_to}
+                                options={assignedUsers.map((user) => ({ value: user.id, label: user.name }))}
+                                onChange={setAssignedTo}
+                                onSearchChange={setAssignedSearchTerm}
+                                isLoading={assignedUsersLoading}
+                            />
+
+                        </div>
+
 
                         <Select
                             label={t('coupons.filters.returnable')}
@@ -186,118 +289,71 @@ export const Coupons = () => {
                             ]}
                             onChange={(e) => setReturnable(e.target.value === '' ? undefined : e.target.value === 'true')}
                         />
-                        <Input
-                            type="number"
-                            min={0}
-                            placeholder={t('coupons.filters.minAmount')}
-                            className="w-full md:w-auto"
-                            value={min_amount || ''}
-                            onChange={(e) => setMinAmount(e.target.value ? parseInt(e.target.value) : undefined)}
-                        />
 
-                        <Input
-                            type="number"
-                            className="w-full md:w-auto"
-                            placeholder={t('coupons.filters.maxAmount')}
-                            value={max_amount || ''}
-                            onChange={(e) => setMaxAmount(e.target.value ? parseInt(e.target.value) : undefined)}
-                        />
+                        {/* 
+                        <Button type="button" variant="primary" onClick={handleApplyFilters}>
+                            {t("common.labels.search")}
+                        </Button> */}
 
-                        <div className="flex flex-col   gap-2">
-
-                            <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-                                <Input
-                                    type="date"
-                                    className="w-full md:w-auto"
-                                    placeholder={t('coupons.filters.expiredAfter')}
-                                    value={expires_after || ''}
-                                    onChange={(e) => setExpiresAfter(e.target.value)}
-                                />
-                                <Input
-                                    type="date"
-                                    className="w-full md:w-auto"
-                                    placeholder={t('coupons.filters.expiredBefore')}
-                                    value={expires_before || ''}
-                                    onChange={(e) => setExpiresBefore(e.target.value)}
-                                />
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div className="flex flex-col md:flex-row gap-2">
-                            <Input
-                                type="date"
-                                placeholder={t('coupons.filters.createdAfter')}
-                                className="w-full md:w-auto"
-                                value={created_after || ''}
-                                onChange={(e) => setCreatedAfter(e.target.value)}
-                            />
-                            <Input
-                                type="date"
-                                placeholder={t('coupons.filters.createdBefore')}
-                                className="w-full md:w-auto"
-                                value={created_before || ''}
-                                onChange={(e) => setCreatedBefore(e.target.value)}
-                            />
-                        </div>
-
-
-
-
-                        <Button variant="primary" onClick={handleApplyFilters}>{t('common.labels.search')}</Button>
                         <Button variant="outline" onClick={handleReset}> {t('common.actions.clearFilters')}</Button>
                     </div>
 
-                    {coupons && coupons.length > 0 ? (
-                        <Table headers={[t('coupons.headers.code'), t('coupons.headers.amount'), t('coupons.headers.pool'),
-                        // t('coupons.headers.status'),
-                        t('coupons.headers.expiration_date'), t('coupons.headers.redeemed_by'), t('coupons.headers.with_return'), t('coupons.headers.creator'), t('common.labels.actions')]} >
-                            {coupons.map((coupon) => (
-                                <tr key={coupon.id} className="block md:table-row bg-card mb-4 rounded-lg shadow-sm border p-4 md:p-0 md:mb-0 md:shadow-none md:border-b md:border-border md:bg-transparent">
-                                    <TableCell label={t('coupons.headers.code')}><CopyTextComponent textToCopy={coupon.code} /></TableCell>
-                                    <TableCell label={t('coupons.headers.amount')}>{coupon.amount}</TableCell>
-                                    <TableCell label={t('coupons.headers.pool')}>{coupon.pool}</TableCell>
-                                    {/* <TableCell label={t('coupons.headers.status')}>{coupon.status}</TableCell> */}
-                                    <TableCell label={t('coupons.headers.expiration_date')}>{new Date(coupon.expiration_date).toLocaleDateString()}</TableCell>
-                                    <TableCell label={t('coupons.headers.redeemed_by')}>{coupon.assigned_user?.username || 'N/A'}</TableCell>
-                                    <TableCell label={t('coupons.headers.with_return')}>{coupon.with_return}</TableCell>
-                                    <TableCell label={t('coupons.headers.creator')}>{coupon.creator?.username || 'N/A'}</TableCell>
-                                    <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
-                                        <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.actions')}</span>
-                                        <div className="flex gap-2">
-                                            <ButtonGroup >
+                    <div className="relative">
+                        {couponsLoading && specialCoupons && specialCoupons.length > 0 && (
+                            <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-10 rounded-lg">
+                                <Spinner />
+                            </div>
+                        )}
 
-                                                <Button variant="ghost" className="justify-start" onClick={() => { handleView(coupon) }}>{t('common.labels.view')}</Button>
+                        {specialCoupons && specialCoupons.length > 0 ? (
+                            <Table headers={[t('coupons.headers.code'), t('coupons.headers.amount'), t('coupons.headers.pool'),
+                            // t('coupons.headers.status'),
+                            // t('coupons.headers.expiration_date'), 
+                            t('coupons.headers.redeemed_by'), t('coupons.headers.with_return'), t('coupons.headers.creator'), t('common.labels.actions')]} >
+                                {specialCoupons.map((coupon) => (
+                                    <tr key={coupon.id} className="block md:table-row bg-card mb-4 rounded-lg shadow-sm border p-4 md:p-0 md:mb-0 md:shadow-none md:border-b md:border-border md:bg-transparent">
+                                        <TableCell label={t('coupons.headers.code')}><CopyTextComponent textToCopy={coupon.code} /></TableCell>
+                                        <TableCell label={t('coupons.headers.amount')}>{coupon.amount}</TableCell>
+                                        <TableCell label={t('coupons.headers.pool')}>{coupon.pool}</TableCell>
+                                        {/* <TableCell label={t('coupons.headers.status')}>{coupon.status}</TableCell> */}
+                                        {/* <TableCell label={t('coupons.headers.expiration_date')}>{new Date(coupon.expiration_date).toLocaleDateString()}</TableCell> */}
+                                        <TableCell label={t('coupons.headers.redeemed_by')}>{coupon.assigned_user?.username || 'N/A'}</TableCell>
+                                        <TableCell label={t('coupons.headers.with_return')}>{coupon.with_return ? t('common.labels.yes') : t('common.labels.no')}</TableCell>
+                                        <TableCell label={t('coupons.headers.creator')}>{coupon.creator?.username || 'N/A'}</TableCell>
+                                        <td className="flex justify-between items-center md:table-cell py-2 md:py-4 md:px-4 border-b md:border-0 last:border-0">
+                                            <span className="font-semibold md:hidden text-muted-foreground">{t('common.labels.actions')}</span>
+                                            <div className="flex gap-2">
+                                                <ButtonGroup >
 
-                                                {!coupon.is_redeemed &&
-                                                    <>
-                                                        {userPermissions?.includes('Editar Cupones') &&
-                                                            <Button variant="ghost" className="justify-start" onClick={() => { handleEdit(coupon) }}>{t('common.labels.edit')}</Button>
-                                                        }
+                                                    <Button variant="ghost" className="justify-start" onClick={() => { handleView(coupon) }}>{t('common.labels.view')}</Button>
 
-                                                        {/* <Button variant="ghost" className="justify-start w-full" onClick={() => handleChangeStatus(coupon.id, coupon.status === "active" ? "inactive" : "active")}>{t('common.labels.changeStatus')}</Button> */}
-                                                        {userPermissions?.includes('Eliminar Cupones') &&
-                                                            <Button variant="destructive" className="justify-start" onClick={() => handleDelete(coupon)}>{t('common.labels.delete')}</Button>
-                                                        }
+                                                    {!coupon.is_redeemed &&
+                                                        <>
+                                                            {userPermissions?.includes('Editar Cupones') &&
+                                                                <Button variant="ghost" className="justify-start" onClick={() => { handleEdit(coupon) }}>{t('common.labels.edit')}</Button>
+                                                            }
 
-                                                    </>}
+                                                            {/* <Button variant="ghost" className="justify-start w-full" onClick={() => handleChangeStatus(coupon.id, coupon.status === "active" ? "inactive" : "active")}>{t('common.labels.changeStatus')}</Button> */}
+                                                            {userPermissions?.includes('Eliminar Cupones') &&
+                                                                <Button variant="destructive" className="justify-start" onClick={() => handleDelete(coupon)}>{t('common.labels.delete')}</Button>
+                                                            }
 
-                                            </ButtonGroup>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </Table>
-                    ) : (
-                        loading && (
+                                                        </>}
+
+                                                </ButtonGroup>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </Table>
+                        ) : couponsLoading ? (
                             <Spinner />
-                        ) || error && (
-                            <p>{error}</p>
-                        )
-                    )}
+                        ) : couponsError ? (
+                            <p className="text-destructive p-4 text-center">{couponsError}</p>
+                        ) : (
+                            <p className="p-4 text-center text-muted-foreground">{t('common.noData')}</p>
+                        )}
+                    </div>
 
                     {pagination && (
                         <Pagination

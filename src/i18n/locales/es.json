@@ -16,6 +16,7 @@
     "language": "Idioma",
     "accept": "Aceptar",
     "decline": "Declinar",
+    "notFound": "Data no encontrada",
     "generateCode": "Generar código",
     "messages": {
       "createSuccess": "Creado exitosamente",
@@ -55,7 +56,9 @@
       "roles": "Roles",
       "status": "Estado",
       "user": "Usuario",
-      "noPermissions": "No tienes permisos para realizar esta acción"
+      "noPermissions": "No tienes permisos para realizar esta acción",
+      "yes": "Sí",
+      "no": "No"
     },
     "placeholders": {
       "searchByName": "Buscar usuario",
@@ -253,6 +256,7 @@
     "updated_at": "Fecha de actualización",
     "updated_by": "Actualizado por",
     "created_by": "Creado por",
+    "token": "Moneda",
     "confirmDelete": "¿Estás seguro de que quieres eliminar este cupón?",
     "filters": {
       "all": "Todos",
@@ -266,7 +270,8 @@
       "minAmount": "Monto mínimo",
       "maxAmount": "Monto máximo",
       "code": "Código",
-      "redeemedBy": "Asignado a",
+      "assignedTo": "Asignado a",
+      "redeemedBy": "Redimido por",
       "redeemed": "Redimido",
       "notRedeemed": "No redimido",
       "creator": "Creador",

@@ -59,3 +59,8 @@ export interface CreateCouponDTO {
     token?: string;
     user_id?: number;
 }
+
+
+export const pools = ["USDT", "OMD", "OMDB"]
+
+

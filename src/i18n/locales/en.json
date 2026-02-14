@@ -17,6 +17,7 @@
     "accept": "Accept",
     "decline": "Decline",
     "generateCode": "Generate code",
+    "notFound": "Not Found",
     "labels": {
       "name": "Name",
       "description": "Description",
@@ -44,7 +45,9 @@
       "allRoles": "All Roles",
       "assign": "Assign role",
       "user": "User",
-      "noPermissions": "You don't have permissions to perform this action"
+      "noPermissions": "You don't have permissions to perform this action",
+      "yes": "Yes",
+      "no": "No"
     },
     "placeholders": {
       "searchByName": "Search user",
@@ -247,6 +250,7 @@
     "updated_at": "Updated at",
     "updated_by": "Updated by",
     "created_by": "Created by",
+    "token": "Token",
     "confirmDelete": "Are you sure you want to delete this coupon?",
     "filters": {
       "all": "All",
@@ -260,7 +264,8 @@
       "minAmount": "Minimum amount",
       "maxAmount": "Maximum amount",
       "code": "Code",
-      "redeemedBy": "Assigned to",
+      "assignedTo": "Assigned to",
+      "redeemedBy": "Redeemed by",
       "redeemed": "Redeemed",
       "notRedeemed": "Not redeemed",
       "creator": "Creator",

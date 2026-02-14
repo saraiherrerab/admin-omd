@@ -36,7 +36,7 @@ export const CouponView = ({ id }: CouponViewProps) => {
                         {coupon.assigned_user ? (
                             <span >{coupon.assigned_user.email} - {coupon.assigned_user.username}</span>
                         ) : (
-                            <span >Not assigned</span>
+                            <span >N/A</span>
                         )}
 
                         <p>{t('coupons.is_redeemed')}: <span >{coupon.is_redeemed ? 'Redeemed' : 'Not redeemed'}</span></p>

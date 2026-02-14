@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
 import api from '../services/api';
 import type  { Coupon, CouponFilters, CreateCouponDTO } from '../types/coupons';
+import axios from 'axios';
 
 export const useCoupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [specialCoupons, setSpecialCoupons] = useState<Coupon[]>([]);
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,6 +102,28 @@ export const useCoupons = () => {
     }
   }, []);
 
+// Provisional para buscar cupones en la base de datos de VPS porque el backend local no tiene esta parte correcta, se deberia usar getCoupons
+  const specialGetCoupons = useCallback(async (filters: CouponFilters) => {
+    setLoading(true);
+    setError(null);
+    try {
+        // Remove empty strings, null, and undefined values from params
+      const params = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+      ); 
+      const response = await axios.get('http://15.204.232.20:7234/coupons', { params });
+     
+       // console.log(response.data);
+        setSpecialCoupons(response.data.data);
+        setPagination(response.data.meta);
+     
+    } catch (err: any) {
+      console.error('Error fetching coupons:', err);
+      setError(err.response?.data?.message || err.message || 'Error fetching permissions');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const updateCoupon = useCallback(async (id: number, coupon: CreateCouponDTO) => {
     setLoading(true);
@@ -133,5 +157,7 @@ export const useCoupons = () => {
     deleteCoupon,
     createCoupon,
     updateCoupon,
+    specialGetCoupons,
+    specialCoupons,
   };
 };
