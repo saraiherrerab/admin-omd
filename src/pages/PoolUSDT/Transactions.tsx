@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Chip } from "@/components/ui/Chip";
 import { Pagination } from "@/components/ui/Pagination";
+import { Dialog } from "@/components/ui/Dialog";
 import {
     Plus,
     Download,
@@ -15,7 +16,6 @@ import {
     CheckCircle2,
     Clock,
     XCircle,
-    Eye,
     Calendar,
     Filter
 } from "lucide-react";
@@ -31,7 +31,7 @@ const MOCK_TRANSACTIONS = Array.from({ length: 45 }, (_, i) => ({
     amount: (Math.random() * 2000 + 100).toFixed(2),
     fee: (Math.random() * 50).toFixed(2),
     net: '0.00', // Calculated below
-    date: '28 Nov, 2023 14:30 PM',
+    date: '28/11/2023 14:30',
     status: i % 5 === 0 ? 'Pendiente' : i % 8 === 0 ? 'Fallido' : 'Completado'
 })).map(tx => ({
     ...tx,
@@ -41,6 +41,8 @@ const MOCK_TRANSACTIONS = Array.from({ length: 45 }, (_, i) => ({
 export const Transactions = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedTx, setSelectedTx] = useState<any>(null);
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const itemsPerPage = 8;
 
     // --- Chart Logic ---
@@ -94,6 +96,22 @@ export const Transactions = () => {
             case 'Fallido': return 'destructive';
             default: return 'info';
         }
+    };
+
+    const openDetails = (tx: any) => {
+        // En un futuro, aquí se consultaría el backend por el ID
+        setSelectedTx({
+            ...tx,
+            method: tx.id.includes('2') ? 'Cupón' : 'Depósito Directo',
+            actualBalance: tx.amount,
+            interestRate: '8.00%',
+            totalEarned: '$0.00',
+            lastPayment: '$0.00',
+            withReturn: 'Sí',
+            startDate: tx.date,
+            endDate: '03/02/2027 22:01'
+        });
+        setIsDetailsOpen(true);
     };
 
     return (
@@ -269,9 +287,12 @@ export const Transactions = () => {
                                                 {tx.date}
                                             </td>
                                             <td className="pr-6 py-3 text-right">
-                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-primary">
-                                                    <Eye className="h-4 w-4" />
-                                                </Button>
+                                                <button
+                                                    onClick={() => openDetails(tx)}
+                                                    className="text-[10px] font-bold text-primary hover:underline"
+                                                >
+                                                    Ver detalles
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -330,6 +351,48 @@ export const Transactions = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Details Popout */}
+            <Dialog
+                open={isDetailsOpen}
+                onClose={() => setIsDetailsOpen(false)}
+                className="max-w-xl p-0 overflow-hidden"
+            >
+                {selectedTx && (
+                    <div className="flex flex-col">
+                        {/* Custom Header to match the reference look, but in Light Mode */}
+                        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="text-base font-semibold text-slate-800">Detalles de Inversión</h3>
+                        </div>
+
+                        <div className="p-8 grid grid-cols-2 gap-y-8 gap-x-12">
+                            <DetailItem label="ID" value={selectedTx.id} />
+                            <DetailItem label="Usuario" value={selectedTx.user.name} />
+                            <DetailItem label="Método" value={selectedTx.method} />
+                            <DetailItem label="Monto" value={`$${selectedTx.amount}`} />
+                            <DetailItem label="Balance Actual" value={`$${selectedTx.actualBalance}`} />
+                            <DetailItem label="Tasa de Interés" value={selectedTx.interestRate} />
+                            <DetailItem label="Total Ganado" value={selectedTx.totalEarned} />
+                            <DetailItem label="Último Pago" value={selectedTx.lastPayment} />
+                            <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Estado</p>
+                                <Chip label={selectedTx.status} variant={statusVariant(selectedTx.status)} />
+                            </div>
+                            <DetailItem label="Con Retorno" value={selectedTx.withReturn} />
+                            <DetailItem label="Inicio" value={selectedTx.startDate} />
+                            <DetailItem label="Fin" value={selectedTx.endDate} />
+                        </div>
+                    </div>
+                )}
+            </Dialog>
         </Layout>
     );
 };
+
+// Helper components
+const DetailItem = ({ label, value }: { label: string; value: string }) => (
+    <div>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+        <p className="text-sm font-semibold text-slate-800">{value}</p>
+    </div>
+);
