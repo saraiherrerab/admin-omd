@@ -1,6 +1,19 @@
 import { useState, useCallback } from 'react';
 import api from '@/services/api';
 import type { Investment, InvestmentResponse } from '@/types/investments'; 
+import { UserService } from '@/services/userService';
+
+// Helper to format invalid dates
+const formatDate = (dateString?: string) => {
+    if (!dateString) return new Date();
+    const d = new Date(dateString);
+    return isNaN(d.getTime()) ? new Date() : d; 
+};
+
+const formatCurrency = (amount: any) => {
+    const num = Number(amount);
+    return isNaN(num) ? 0 : num;
+}
 
 export const useInvestments = (initialPoolId?: string) => {
     const [data, setData] = useState<Investment[]>([]);
@@ -48,8 +61,6 @@ export const useInvestments = (initialPoolId?: string) => {
                 if (uuidRegex.test(search)) {
                     queryParams.append('deposit_id', search);
                 }
-                // If backend supports generic search in future, add 'q' here
-                // queryParams.append('q', search); 
             }
 
             // Always use search endpoint for filtering
@@ -61,19 +72,37 @@ export const useInvestments = (initialPoolId?: string) => {
             const responseData = response.data;
             
             // Map backend response (snake_case) to frontend model (camelCase)
-            const mappedData = (responseData.data || []).map((item: any) => ({
-                ...item, // Keep original properties
-                // Map snake_case to camelCase
-                userId: item.user_id || item.userId,
-                poolId: item.pool_id || item.poolId,
-                amount: item.allocated_amount ?? item.amount,
-                yieldRate: item.yield_rate ?? item.yieldRate,
-                status: item.status, // Usually same
-                startDate: item.confirmed_at || item.start_at || item.created_at || item.startDate,
-                endDate: item.end_date || item.endDate,
-                // Ensure ID is string
-                id: item.id || item.investment_id
-            }));
+            // Use Promise.all to fetch user details in parallel
+            const mappedDataPromises = (responseData.data || []).map(async (item: any) => {
+                let userDetails = item.user;
+                const userId = item.user_id || item.userId;
+
+                // Fetch user details if missing and we have an ID
+                if (!userDetails && userId && userId !== 'N/A') {
+                    try {
+                         userDetails = await UserService.getUserById(userId);
+                    } catch (e) {
+                        console.warn('Failed to fetch user for investment', item.id);
+                    }
+                }
+
+                return {
+                    ...item, // Keep original properties
+                    // Map snake_case to camelCase
+                    userId: userId,
+                    poolId: item.pool_id || item.poolId,
+                    amount: formatCurrency(item.allocated_amount ?? item.amount),
+                    yieldRate: item.yield_rate ?? item.yieldRate,
+                    status: item.status, // Usually same
+                    startDate: formatDate(item.confirmed_at || item.start_at || item.created_at || item.startDate).toISOString(), 
+                    endDate: item.end_date || item.endDate,
+                    // Ensure ID is string
+                    id: item.id || item.investment_id,
+                    user: userDetails || { name: 'N/A' }
+                };
+            });
+
+            const mappedData = await Promise.all(mappedDataPromises);
 
             setData(mappedData);
             setPagination({
