@@ -97,7 +97,8 @@ export const Transactions = () => {
         totalPages: Number(pagination.totalPages),
         page: Number(pagination.page),
         limit: Number(pagination.limit),
-        hasNext: Number(pagination.page) < Number(pagination.totalPages),
+        // Use hasNextPage from hook if available, otherwise check against totalPages if > 0
+        hasNext: (pagination as any).hasNextPage ?? (Number(pagination.totalPages) > 0 && Number(pagination.page) < Number(pagination.totalPages)),
         hasPrev: Number(pagination.page) > 1
     };
 
