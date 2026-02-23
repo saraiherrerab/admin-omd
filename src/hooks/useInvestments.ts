@@ -75,15 +75,32 @@ export const useInvestments = (initialPoolId?: string) => {
             // Use Promise.all to fetch user details in parallel
             const mappedDataPromises = (responseData.data || []).map(async (item: any) => {
                 let userDetails = item.user;
-                const userId = item.user_id || item.userId;
+                
+                // Try all possible fields for user ID
+                const userId = item.user_id || item.userId || item.investor_id || item.owner_id || item.client_id || item.account_id || (userDetails && userDetails.id);
 
                 // Fetch user details if missing and we have an ID
-                if (!userDetails && userId && userId !== 'N/A') {
+                if ((!userDetails || (userDetails && !userDetails.name)) && userId && userId !== 'N/A') {
                     try {
-                         userDetails = await UserService.getUserById(userId);
+                         // Only fetch if it looks like a valid ID (number or non-empty string)
+                         if (Number(userId) > 0 || (typeof userId === 'string' && userId.length > 0)) {
+                             const fetchedUser = await UserService.getUserById(userId);
+                             
+                             if (fetchedUser && fetchedUser.name && fetchedUser.name !== 'N/A') {
+                                 userDetails = fetchedUser;
+                             } else {
+                                // Fallback to ID substring if fetch failed or returned nothing useful
+                                userDetails = { ...fetchedUser, id: userId, name: `User ${String(userId).substring(0, 8)}...` };
+                             }
+                         }
                     } catch (e) {
-                        console.warn('Failed to fetch user for investment', item.id);
+                         console.warn('Failed to fetch user for investment', item.id, e);
+                         userDetails = { id: userId, name: `ID: ${String(userId).substring(0, 8)}...` };
                     }
+                } else if (!userDetails && userId) {
+                     // We have ID perfectly but failed to logic fetching? (Shouldn't happen with above if)
+                     // Or maybe ID is 'N/A'
+                     userDetails = { name: 'N/A' };
                 }
 
                 return {
@@ -98,7 +115,7 @@ export const useInvestments = (initialPoolId?: string) => {
                     endDate: item.end_date || item.endDate,
                     // Ensure ID is string
                     id: item.id || item.investment_id,
-                    user: userDetails || { name: 'N/A' }
+                    user: userDetails || { id: userId, name: userId && userId!=='N/A' ? `User ${String(userId).substring(0, 8)}` : 'N/A' }
                 };
             });
 
