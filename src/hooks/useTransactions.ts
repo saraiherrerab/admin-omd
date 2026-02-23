@@ -77,79 +77,93 @@ export const useTransactions = (initialPoolId?: string) => {
             const responseData = response.data;
             
             // Map backend response (snake_case) to frontend model (camelCase)
-            const mappedDataPromises = (responseData.data || []).map(async (item: any, index: number) => {
-                let userDetails = item.user;
-                
-                // Try all possible fields for user ID
-                const userId = item.user_id || item.userId || item.owner_id || item.client_id || item.account_id;
+            // First map the basic data synchronously as much as possible
+            const initialMappedData = (responseData.data || []).map((item: any) => {
+                 let userDetails = item.user;
+                 const userId = item.user_id || item.userId || item.owner_id || item.client_id || item.account_id;
+                 
+                 // Placeholder while fetching
+                 if ((!userDetails || !userDetails.name) && userId && userId !== 'N/A') {
+                     userDetails = { id: userId, name: 'Cargando...', _needsFetch: true };
+                 } else if (!userDetails) {
+                     userDetails = { name: 'N/A' };
+                 }
 
-                // Fetch user details if missing and we have an ID
-                // Add staggered delay to avoid hammering API
-                if ((!userDetails || !userDetails.name) && userId && userId !== 'N/A') {
-                    // Delay based on index to spread requests (50ms gap)
-                    await new Promise(r => setTimeout(r, index * 150));
-                    
-                    try {
-                         if (Number(userId) > 0 || (typeof userId === 'string' && userId.length > 0)) {
-                             const fetchedUser = (await UserService.getUserById(userId)) as any;
-                             if (fetchedUser && fetchedUser.name !== 'N/A') {
-                                 userDetails = fetchedUser;
-                             } else {
-                                userDetails = { ...fetchedUser, id: userId, name: `User ${String(userId).substring(0, 8)}...` };
-                             }
-                         }
-                    } catch (e) {
-                         // Silent fail for UI
-                         userDetails = { id: userId, name: `ID: ${String(userId).substring(0, 8)}...` };
-                    }
-                } else if (!userDetails) {
-                    userDetails = { name: 'N/A' };
-                }
-
-                const amount = formatCurrency(item.amount);
-                const fee = formatCurrency(item.fee || 0); // Assuming fee might come from backend
-
-                return {
+                 return {
                     ...item,
                     userId: userId,
                     poolId: item.pool_id || item.poolId,
-                    amount: amount,
-                    fee: fee,
-                    net: amount - fee, // Calculate net if not provided
-                    currency: item.currency || 'USD', // Default if missing
-                    status: item.status, 
+                    amount: formatCurrency(item.amount),
+                    fee: formatCurrency(item.fee || 0),
+                    net: formatCurrency(item.amount) - formatCurrency(item.fee || 0),
+                    currency: item.currency || 'USD',
+                    status: item.status,
                     type: item.type || item.transaction_type || 'Unknown',
                     txHash: item.tx_hash || item.hask,
                     toAddress: item.to_address,
                     date: formatDate(item.created_at || item.createdAt || item.date).toISOString(),
-                    // Ensure ID is string
                     id: item.id || item.transaction_id,
                     user: userDetails
                 };
             });
 
-            // Robust pagination data handling
-            const mappedData = await Promise.all(mappedDataPromises);
+            // Identify users that need fetching
+            const usersToFetch = initialMappedData
+                .filter((item: any) => item.user._needsFetch)
+                .map((item: any) => item.userId);
+            
+            // Deduplicate IDs
+            const uniqueUserIds = [...new Set(usersToFetch)] as string[];
+
+            // Fetch users with concurrency limit (e.g., 3 at a time)
+            if (uniqueUserIds.length > 0) {
+                const fetchUser = async (id: string) => {
+                    try {
+                        if (Number(id) > 0 || (typeof id === 'string' && id.length > 0)) {
+                            return await UserService.getUserById(id);
+                        }
+                    } catch (e) { /* ignore */ }
+                    return null;
+                };
+
+                // Execute in batches of 3
+                const batchSize = 3;
+                for (let i = 0; i < uniqueUserIds.length; i += batchSize) {
+                    const batch = uniqueUserIds.slice(i, i + batchSize);
+                    await Promise.all(batch.map(fetchUser)); // UserService caches the result
+                }
+            }
+            
+            // Re-map with fetched user data (from cache)
+            const finalMappedData = await Promise.all(initialMappedData.map(async (item: any) => {
+                if (item.user._needsFetch) {
+                    try {
+                        const user = await UserService.getUserById(item.userId);
+                        return { ...item, user: user.name && user.name !== 'N/A' ? user : { ...user, name: `User ${String(item.userId).substring(0, 8)}...` } };
+                    } catch {
+                        return { ...item, user: { id: item.userId, name: `ID: ${String(item.userId).substring(0, 8)}...` } };
+                    }
+                }
+                return item;
+            }));
 
             let currentPage = Number(responseData.page) || page;
             let currentLimit = Number(responseData.limit) || limit;
             let currentTotal = Number(responseData.total);
+            let totalPages = Number(responseData.totalPages);
 
-            // If backend doesn't return total, try to infer reasonable defaults
-            if (isNaN(currentTotal) || currentTotal === 0) {
-                if (mappedData.length >= currentLimit) {
-                    // If page is full, assume there's at least one more item
-                    currentTotal = (currentPage * currentLimit) + 1;
-                } else {
-                    // If page is not full, this is the last page
-                    currentTotal = ((currentPage - 1) * currentLimit) + mappedData.length;
-                }
+            // Correct handling for unknown total:
+            // If backend provides 0 total but we have data, it means total is unknown.
+            // We shouldn't fake a growing total, but we can indicate if there's *likely* a next page.
+            // Since our Pagination component expects totalPages, we have to pass something or null.
+            
+            if (!currentTotal && finalMappedData.length > 0) {
+                 // Unknown total
+                 currentTotal = 0; 
+                 totalPages = 0; // Use 0 to signal "unknown"
             }
 
-            const calculatedTotalPages = currentLimit > 0 ? Math.ceil(currentTotal / currentLimit) : 0;
-            const totalPages = Number(responseData.totalPages) || calculatedTotalPages;
-
-            setData(mappedData);
+            setData(finalMappedData);
             setPagination({
                 page: currentPage,
                 limit: currentLimit,

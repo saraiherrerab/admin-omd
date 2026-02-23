@@ -21,7 +21,7 @@ export const Pagination = ({ currentPage, pagination, setCurrentPage }: Paginati
         <div className="flex justify-between items-center mt-4">
 
             <p className="text-sm text-muted-foreground">
-                {t('common.pagination.page')} {currentPage} {pagination?.totalPages ? `/ ${pagination.totalPages}` : ''}
+                {t('common.pagination.page')} {currentPage} {pagination?.totalPages && pagination.totalPages > 0 ? `/ ${pagination.totalPages}` : ''}
             </p>
             <div className="flex gap-2">
                 <Button

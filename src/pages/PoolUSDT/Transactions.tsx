@@ -92,12 +92,17 @@ export const Transactions = () => {
     const { linePath, areaPath } = useMemo(() => generateAreaPath(incomeData), []);
 
     // Handle pagination from backend
+    // Logic updated to handle unknown totals (totalPages = 0)
+    const hasMorePages = pagination.totalPages && pagination.totalPages > 0 
+        ? Number(pagination.page) < Number(pagination.totalPages) 
+        : transactions.length >= Number(pagination.limit); // If full page, assume more
+
     const paginationInfo = {
         total: Number(pagination.total),
         totalPages: Number(pagination.totalPages),
         page: Number(pagination.page),
         limit: Number(pagination.limit),
-        hasNext: Number(pagination.page) < Number(pagination.totalPages),
+        hasNext: hasMorePages,
         hasPrev: Number(pagination.page) > 1
     };
 
