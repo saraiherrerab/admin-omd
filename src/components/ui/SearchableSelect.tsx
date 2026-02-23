@@ -13,7 +13,7 @@ interface AsyncSelectProps extends Omit<ComponentProps<"div">, 'onChange'> {
 }
 
 export const SearchableSelect = forwardRef<HTMLDivElement, AsyncSelectProps>(
-    ({ options, label, onChange, onSearchChange, isLoading }) => {
+    ({ options, label, onChange, onSearchChange, isLoading }, ref) => {
         const [search, setSearch] = useState("");
         const [selectedOption, setSelectedOption] = useState(null);
 
@@ -39,7 +39,7 @@ export const SearchableSelect = forwardRef<HTMLDivElement, AsyncSelectProps>(
 
 
         return (
-            <div className="w-full">
+            <div className="w-full" ref={ref}>
                 <div className="flex flex-row gap-2">
                     <Input
                         placeholder={label}

@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useInvestments } from '@/hooks/useInvestments';
 import { Layout } from '@/components/Layout';
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -16,37 +17,33 @@ import {
     Search
 } from "lucide-react";
 
-// --- Mock Data ---
-const MOCK_INVESTMENTS = Array.from({ length: 24 }, (_, i) => {
-    const types = [
-        { name: 'Ethereum Staking', icon: <Coins className="h-4 w-4" />, method: 'Crypto Wallet' },
-        { name: 'Tesla Inc. Stocks', icon: <Globe className="h-4 w-4" />, method: 'Brokerage' },
-        { name: 'Bitcoin Holding', icon: <Bitcoin className="h-4 w-4" />, method: 'Cold Storage' },
-        { name: 'S&P 500 ETF', icon: <BarChart3 className="h-4 w-4" />, method: 'Vanguard' }
-    ];
-    const type = types[i % types.length];
-    const amount = (Math.random() * 50000 + 5000).toFixed(2);
-    const yieldRate = (Math.random() * 15 - 2).toFixed(1);
-
-    return {
-        id: `#INV-${10542 - i}`,
-        asset: type.name,
-        type: i % 3 === 0 ? 'Cripto' : i % 3 === 1 ? 'Acciones' : 'ETF',
-        icon: type.icon,
-        method: type.method,
-        user: {
-            name: i % 2 === 0 ? 'Alex Morgan' : i % 3 === 0 ? 'Sarah Connor' : 'Carlos Méndez',
-            avatar: `https://i.pravatar.cc/150?u=user${i}`
-        },
-        amount: parseFloat(amount),
-        yield: yieldRate,
-        estReturn: (parseFloat(amount) * (parseFloat(yieldRate) / 100)).toFixed(2),
-        status: i % 6 === 0 ? 'Cerrado' : i % 4 === 0 ? 'Pendiente' : 'Activo',
-        date: '12/10/2023'
-    };
-});
+// --- Helper Functions ---
+const getIconForType = (type: string) => {
+    switch (type.toLowerCase()) {
+        case 'cripto':
+        case 'ethereum staking':
+        case 'bitcoin holding':
+            return <Coins className="h-4 w-4" />;
+        case 'acciones':
+        case 'tesla inc. stocks':
+        case 's&p 500 etf':
+            return <BarChart3 className="h-4 w-4" />;
+        case 'etf':
+            return <Globe className="h-4 w-4" />;
+        default:
+            return <Bitcoin className="h-4 w-4" />;
+    }
+};
 
 export const Investments = () => {
+    // --- Data Fetching ---
+    const { 
+        investments, 
+        loading, 
+        pagination, 
+        fetchInvestments 
+    } = useInvestments('USDT');
+
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedInv, setSelectedInv] = useState<any>(null);
@@ -54,34 +51,36 @@ export const Investments = () => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const itemsPerPage = 6;
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchInvestments({ 
+                page: currentPage, 
+                limit: itemsPerPage, 
+                search: searchTerm,
+                poolId: 'USDT'
+            });
+        }, 500); // Debounce search
+        return () => clearTimeout(timer);
+    }, [searchTerm, currentPage, fetchInvestments]);
 
-    const filteredData = useMemo(() => {
-        return MOCK_INVESTMENTS.filter(inv =>
-            inv.asset.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            inv.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            inv.id.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [searchTerm]);
-
-    const paginatedData = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage;
-        return filteredData.slice(start, start + itemsPerPage);
-    }, [filteredData, currentPage]);
-
+    // Handle pagination from backend
     const paginationInfo = {
-        total: filteredData.length,
-        totalPages: Math.ceil(filteredData.length / itemsPerPage),
-        page: currentPage,
-        limit: itemsPerPage,
-        hasNext: currentPage < Math.ceil(filteredData.length / itemsPerPage),
-        hasPrev: currentPage > 1
+        total: pagination.total,
+        totalPages: pagination.totalPages,
+        page: pagination.page,
+        limit: pagination.limit,
+        hasNext: pagination.page < pagination.totalPages,
+        hasPrev: pagination.page > 1
     };
 
     const statusVariant = (status: string): 'success' | 'warning' | 'destructive' | 'info' => {
-        switch (status) {
-            case 'Activo': return 'success';
-            case 'Pendiente': return 'warning';
-            case 'Cerrado': return 'info';
+        switch (status?.toLowerCase()) {
+            case 'active':
+            case 'activo': return 'success';
+            case 'pending': 
+            case 'pendiente': return 'warning';
+            case 'closed':
+            case 'cerrado': return 'info';
             default: return 'info';
         }
     };
@@ -89,12 +88,13 @@ export const Investments = () => {
     const openDetails = (inv: any) => {
         setSelectedInv({
             ...inv,
-            interestRate: '8.00%',
-            totalEarned: inv.estReturn,
-            lastPayment: '$450.00',
-            withReturn: 'Sí',
-            startDate: inv.date,
-            endDate: '03/02/2027 22:01',
+            // Fallback for missing backend fields during dev/mock API mismatch
+            interestRate: inv.interestRate || '0.00%',
+            totalEarned: inv.totalEarned || inv.estReturn || 0,
+            lastPayment: inv.lastPayment || 0,
+            withReturn: inv.withReturn!==undefined ? (inv.withReturn ? 'Sí' : 'No') : 'Sí',
+            startDate: inv.startDate || inv.date,
+            endDate: inv.endDate,
             balance: inv.amount
         });
         setIsDetailsOpen(true);
@@ -199,24 +199,41 @@ export const Investments = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
-                                    {paginatedData.map((inv) => (
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan={9} className="text-center py-6 text-slate-500">Cargando...</td>
+                                        </tr>
+                                    ) : investments.length === 0 ? (
+                                         <tr>
+                                            <td colSpan={9} className="text-center py-6 text-slate-500">No se encontraron inversiones</td>
+                                        </tr>
+                                    ) : (
+                                        investments.map((inv) => (
                                         <tr key={inv.id} className="hover:bg-slate-50/50 transition-colors group">
-                                            <td className="px-4 py-3 text-[11px] font-medium text-slate-900">{inv.id.replace('#INV-', '')}</td>
-                                            <td className="px-4 py-3 text-[11px] text-slate-600 font-medium">{inv.type}</td>
-                                            <td className="px-4 py-3 text-[11px] text-slate-600 font-medium">{inv.user.name}</td>
-                                            <td className="px-4 py-3 text-[11px] font-bold text-slate-900">{inv.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })} US$</td>
-                                            <td className={`px-4 py-3 text-[11px] font-bold ${parseFloat(inv.yield) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                                                {parseFloat(inv.yield) >= 0 ? '+' : ''}{inv.yield}%
+                                            <td className="px-4 py-3 text-[11px] font-medium text-slate-900 flex items-center gap-2">
+                                                {getIconForType(inv.type || inv.asset)}
+                                                {inv.id.substring(0, 8)}...
                                             </td>
-                                            <td className="px-4 py-3 text-[11px] font-bold text-slate-900">{parseFloat(inv.estReturn).toLocaleString('es-ES', { minimumFractionDigits: 2 })} US$</td>
-                                            <td className="px-4 py-3 text-[11px] text-slate-500 font-medium">{inv.date}</td>
+                                            <td className="px-4 py-3 text-[11px] text-slate-600 font-medium">{inv.asset || inv.type}</td>
+                                            <td className="px-4 py-3 text-[11px] text-slate-600 font-medium">{inv.user?.name || 'N/A'}</td>
+                                            <td className="px-4 py-3 text-[11px] font-bold text-slate-900">
+                                                {typeof inv.amount === 'number' ? inv.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 }) : inv.amount} US$
+                                            </td>
+                                            <td className={`px-4 py-3 text-[11px] font-bold ${Number(inv.yieldRate) >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                {Number(inv.yieldRate) >= 0 ? '+' : ''}{inv.yieldRate}%
+                                            </td>
+                                            <td className="px-4 py-3 text-[11px] font-bold text-slate-900">
+                                                {typeof inv.estReturn === 'number' ? inv.estReturn.toLocaleString('es-ES', { minimumFractionDigits: 2 }) : inv.estReturn} US$
+                                            </td>
+                                            <td className="px-4 py-3 text-[11px] text-slate-500 font-medium">
+                                                {new Date(inv.startDate).toLocaleDateString()}
+                                            </td>
                                             <td className="px-4 py-3 text-center">
-                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${inv.status === 'Activa' || inv.status === 'Activo' ? 'bg-slate-900 text-white' :
-                                                    inv.status === 'Pendiente' ? 'bg-amber-100 text-amber-700' :
-                                                        'bg-slate-100 text-slate-500'
-                                                    }`}>
-                                                    {inv.status}
-                                                </span>
+                                                <Chip 
+                                                    label={inv.status} 
+                                                    variant={statusVariant(inv.status)} 
+                                                    className="uppercase tracking-wider text-[10px]"
+                                                />
                                             </td>
                                             <td className="px-4 py-3 text-right">
                                                 <button
@@ -227,14 +244,14 @@ export const Investments = () => {
                                                 </button>
                                             </td>
                                         </tr>
-                                    ))}
+                                    )))}
                                 </tbody>
                             </table>
                         </div>
                     </Card>
 
                     <div className="mt-8 flex items-center justify-between">
-                        <p className="text-sm font-bold text-slate-500">Mostrando {paginatedData.length} de {filteredData.length} inversiones</p>
+                        <p className="text-sm font-bold text-slate-500">Mostrando {investments.length} de {pagination.total} inversiones</p>
                         <Pagination
                             currentPage={currentPage}
                             pagination={paginationInfo}
@@ -258,11 +275,11 @@ export const Investments = () => {
 
                         <div className="p-8 grid grid-cols-2 gap-y-8 gap-x-12">
                             <DetailItem label="ID" value={selectedInv.id} />
-                            <DetailItem label="Tipo" value={selectedInv.type} />
-                            <DetailItem label="Usuario" value={selectedInv.user.name} />
+                            <DetailItem label="Tipo" value={selectedInv.type || selectedInv.asset} />
+                            <DetailItem label="Usuario" value={selectedInv.user?.name || 'N/A'} />
                             <DetailItem label="Método" value={selectedInv.method} />
-                            <DetailItem label="Monto" value={`$${selectedInv.amount.toLocaleString()}`} />
-                            <DetailItem label="Balance Actual" value={`$${selectedInv.balance.toLocaleString()}`} />
+                            <DetailItem label="Monto" value={`$${Number(selectedInv.amount).toLocaleString()}`} />
+                            <DetailItem label="Balance Actual" value={`$${Number(selectedInv.balance).toLocaleString()}`} />
                             <DetailItem label="Tasa de Interés" value={selectedInv.interestRate} />
                             <DetailItem label="Total Ganado" value={`$${selectedInv.totalEarned}`} />
                             <DetailItem label="Último Pago" value={selectedInv.lastPayment} />
@@ -271,8 +288,8 @@ export const Investments = () => {
                                 <Chip label={selectedInv.status} variant={statusVariant(selectedInv.status)} />
                             </div>
                             <DetailItem label="Con Retorno" value={selectedInv.withReturn} />
-                            <DetailItem label="Inicio" value={selectedInv.date} />
-                            <DetailItem label="Fin" value={selectedInv.endDate} />
+                            <DetailItem label="Inicio" value={new Date(selectedInv.startDate || Date.now()).toLocaleDateString()} />
+                            <DetailItem label="Fin" value={selectedInv.endDate ? new Date(selectedInv.endDate).toLocaleDateString() : '-'} />
                         </div>
                     </div>
                 )}
@@ -296,7 +313,7 @@ const StatCard = ({ label, value, change, isPositive, subValue }: { label: strin
     </Card>
 );
 
-const DetailItem = ({ label, value }: { label: string; value: string }) => (
+const DetailItem = ({ label, value }: { label: string; value: string | number | undefined }) => (
     <div>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
         <p className="text-sm font-semibold text-slate-800">{value}</p>
