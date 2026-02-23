@@ -2,42 +2,39 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
-import { Search, CheckCircle2, Cpu, HardDrive, RefreshCcw, XCircle } from "lucide-react";
+import { Search, CheckCircle2, Cpu, HardDrive, RefreshCcw, XCircle, Play } from "lucide-react";
 import { Layout } from '@/components/Layout';
+import { WorkerService } from '@/services/workerService';
+import { toast } from 'react-toastify';
 
 interface Worker {
-    id: string;
+    id: string; // name in backend
     name: string;
     description: string;
-    status: 'Active' | 'Stopped';
+    status: 'Active' | 'Stopped' | 'Running' | 'Paused';
+    lastRun?: string;
+    nextRun?: string;
+    cronTime?: string;
 }
 
 export const Workers = () => {
-    // const { t } = useLanguage(); // Using direct text for now
     const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(false);
 
     // --- State Management ---
-    const [workers, setWorkers] = useState<Worker[]>([
-        { id: 'WRK-USDT-01', name: 'Validator-Alpha', description: 'Primary validator node for USDT transactions.', status: 'Active' },
-        { id: 'WRK-USDT-02', name: 'Liquidity-Manager', description: 'Automated liquidity provision bot.', status: 'Active' },
-        { id: 'WRK-USDT-03', name: 'Audit-Daemon', description: 'Real-time transaction auditing service.', status: 'Stopped' },
-        { id: 'WRK-USDT-04', name: 'Yield-Harvester', description: 'Yield farming optimization worker.', status: 'Active' },
-    ]);
+    const [workers, setWorkers] = useState<Worker[]>([]);
 
     // System Stats & History
     const [cpuLoad, setCpuLoad] = useState(65);
     const [memLoad, setMemLoad] = useState(42);
-    const [history, setHistory] = useState<{ cpu: number[], mem: number[] }>({
+    const [history, setHistory] = useState({
         cpu: Array(40).fill(65),
         mem: Array(40).fill(42)
     });
 
-    const activeCount = workers.filter(w => w.status === 'Active').length;
-    const inactiveCount = workers.length - activeCount;
-
     // --- Chart Logic ---
     const generatePath = (data: number[], width: number, height: number) => {
-        if (data.length === 0) return "";
+        if (!data || data.length === 0) return "";
         const step = width / (data.length - 1);
         return data.reduce((path, val, i) => {
             const x = i * step;
@@ -52,7 +49,91 @@ export const Workers = () => {
         return `${linePath} L${width},${height} L0,${height} Z`;
     };
 
-    // Simulating Real-time Telemetry
+    const fetchWorkers = useCallback(async () => {
+        setLoading(true);
+        try {
+            // Fetch workers for USDT pool specifically
+            const response = await WorkerService.getWorkersByPool('USDT'); 
+            
+            // Map backend response to frontend interface
+            const mappedWorkers: Worker[] = Array.isArray(response) ? response.map((w: any) => ({
+                id: w.name,
+                name: w.name,
+                description: w.description || 'Worker process',
+                status: w.running ? 'Running' : (w.status === 'stopped' ? 'Stopped' : 'Active'), 
+                lastRun: w.lastRun,
+                nextRun: w.nextRun,
+                cronTime: w.cronTime
+            })) : [];
+
+             if (mappedWorkers.length === 0) {
+                 try {
+                     const allWorkers: any = await WorkerService.getAllWorkers();
+                     const usdtWorkers = Array.isArray(allWorkers) ? allWorkers.filter((w: any) => w.name?.toUpperCase().includes('USDT')) : [];
+                     
+                     if (usdtWorkers.length > 0) {
+                         setWorkers(usdtWorkers.map((w: any) => ({
+                            id: w.name,
+                            name: w.name,
+                            description: w.description || 'Worker process',
+                            status: w.running ? 'Running' : 'Active',
+                            lastRun: w.lastExecution,
+                            nextRun: w.nextExecution,
+                            cronTime: w.cronTime
+                         })));
+                     } else {
+                         setWorkers([]);
+                     }
+                 } catch (innerError) {
+                     setWorkers([]);
+                 }
+            } else {
+                setWorkers(mappedWorkers);
+            }
+
+        } catch (error) {
+            console.error("Failed to fetch workers", error);
+            toast.error("Failed to load workers status");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchWorkers();
+    }, [fetchWorkers]);
+
+
+    const handleToggleStatus = async (workerId: string, currentStatus: string) => {
+        try {
+            const isActive = currentStatus === 'Active' || currentStatus === 'Running';
+            await WorkerService.toggleWorker(workerId, !isActive);
+            toast.success(`Worker ${workerId} ${!isActive ? 'enabled' : 'disabled'} successfully`);
+            fetchWorkers(); 
+        } catch (e) {
+            toast.error("Failed to update worker status");
+        }
+    };
+    
+    const handleRunNow = async (workerId: string) => {
+        try {
+            await WorkerService.runWorker(workerId);
+            toast.success(`Worker ${workerId} execution started`);
+            setTimeout(fetchWorkers, 2000);
+        } catch (e) {
+             toast.error("Failed to run worker manually");
+        }
+    }
+
+    const filteredWorkers = workers.filter(worker =>
+        worker.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        worker.id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const activeCount = workers.filter(w => w.status === 'Running' || w.status === 'Active').length;
+    const inactiveCount = workers.length - activeCount;
+
+    // Telemetry
     useEffect(() => {
         const interval = setInterval(() => {
             const nextCpu = Math.min(Math.max(cpuLoad + (Math.random() * 8 - 4), 20), 95);
@@ -69,20 +150,6 @@ export const Workers = () => {
         return () => clearInterval(interval);
     }, [cpuLoad, memLoad]);
 
-    const fetchWorkers = useCallback(async () => {
-        console.log('Fetching workers...');
-    }, []);
-
-    const handleToggleStatus = async (workerId: string) => {
-        setWorkers(prev => prev.map(w =>
-            w.id === workerId ? { ...w, status: w.status === 'Active' ? 'Stopped' : 'Active' } : w
-        ));
-    };
-
-    const filteredWorkers = workers.filter(worker =>
-        worker.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        worker.id.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     return (
         <Layout>
@@ -96,8 +163,8 @@ export const Workers = () => {
 
                     <div className="flex items-center gap-4">
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" className="h-10 px-3 flex items-center gap-2" onClick={fetchWorkers}>
-                                <RefreshCcw className="h-4 w-4" />
+                            <Button variant="outline" size="sm" className="h-10 px-3 flex items-center gap-2" onClick={fetchWorkers} disabled={loading}>
+                                <RefreshCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                                 <span className="hidden sm:inline">Refresh</span>
                             </Button>
                         </div>
@@ -217,11 +284,22 @@ export const Workers = () => {
                                             />
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <div
-                                                className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-all duration-300 ml-auto border ${worker.status === 'Active' ? 'bg-emerald-500/20 border-emerald-500/50' : 'bg-muted border-input'}`}
-                                                onClick={() => handleToggleStatus(worker.id)}
-                                            >
-                                                <div className={`w-4 h-4 rounded-full transition-transform duration-300 shadow-sm ${worker.status === 'Active' ? 'translate-x-6 bg-emerald-500' : 'translate-x-0 bg-muted-foreground/40'}`} />
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleRunNow(worker.id)}
+                                                    className="h-8 w-8 p-0 rounded-full hover:bg-blue-50 text-blue-600"
+                                                >
+                                                    <Play className="h-3.5 w-3.5" />
+                                                </Button>
+
+                                                <div
+                                                    className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-all duration-300 border ${worker.status === 'Active' || worker.status === 'Running' ? 'bg-emerald-500/20 border-emerald-500/50' : 'bg-muted border-input'}`}
+                                                    onClick={() => handleToggleStatus(worker.id, worker.status)}
+                                                >
+                                                    <div className={`w-4 h-4 rounded-full transition-transform duration-300 shadow-sm ${worker.status === 'Active' || worker.status === 'Running' ? 'translate-x-6 bg-emerald-500' : 'translate-x-0 bg-muted-foreground/40'}`} />
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
