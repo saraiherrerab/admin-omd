@@ -92,17 +92,12 @@ export const Transactions = () => {
     const { linePath, areaPath } = useMemo(() => generateAreaPath(incomeData), []);
 
     // Handle pagination from backend
-    // Logic updated to handle unknown totals (totalPages = 0)
-    const hasMorePages = pagination.totalPages && pagination.totalPages > 0 
-        ? Number(pagination.page) < Number(pagination.totalPages) 
-        : transactions.length >= Number(pagination.limit); // If full page, assume more
-
     const paginationInfo = {
         total: Number(pagination.total),
         totalPages: Number(pagination.totalPages),
         page: Number(pagination.page),
         limit: Number(pagination.limit),
-        hasNext: hasMorePages,
+        hasNext: Number(pagination.page) < Number(pagination.totalPages),
         hasPrev: Number(pagination.page) > 1
     };
 
@@ -268,18 +263,14 @@ export const Transactions = () => {
                                         <th className="pr-6 py-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider border-b text-right">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody className={`divide-y divide-border ${loading ? 'opacity-50 pointer-events-none transition-opacity duration-200' : ''}`}>
-                                    {transactions.length === 0 && loading ? (
+                                <tbody className="divide-y divide-border">
+                                    {loading ? (
                                         <tr>
-                                            <td colSpan={8} className="text-center py-12 text-slate-500 animate-pulse">
-                                                Cargando transacciones...
-                                            </td>
+                                            <td colSpan={8} className="text-center py-6 text-slate-500">Cargando...</td>
                                         </tr>
                                     ) : transactions.length === 0 ? (
                                         <tr>
-                                            <td colSpan={8} className="text-center py-12 text-slate-500">
-                                                No se encontraron transacciones
-                                            </td>
+                                            <td colSpan={8} className="text-center py-6 text-slate-500">No se encontraron transacciones</td>
                                         </tr>
                                     ) : (
                                         transactions.map((tx) => (

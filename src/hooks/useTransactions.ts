@@ -77,117 +77,66 @@ export const useTransactions = (initialPoolId?: string) => {
             const responseData = response.data;
             
             // Map backend response (snake_case) to frontend model (camelCase)
-            // First map the basic data synchronously as much as possible
-            const initialMappedData = (responseData.data || []).map((item: any) => {
-                 let userDetails = item.user;
-                 const userId = item.user_id || item.userId || item.owner_id || item.client_id || item.account_id;
-                 
-                 // Placeholder while fetching
-                 if ((!userDetails || !userDetails.name) && userId && userId !== 'N/A') {
-                     userDetails = { id: userId, name: 'Cargando...', _needsFetch: true };
-                 } else if (!userDetails) {
-                     userDetails = { name: 'N/A' };
-                 }
+            const mappedDataPromises = (responseData.data || []).map(async (item: any) => {
+                let userDetails = item.user;
+                
+                // Try all possible fields for user ID
+                const userId = item.user_id || item.userId || item.owner_id || item.client_id || item.account_id;
 
-                 return {
+                // Fetch user details if missing and we have an ID
+                if ((!userDetails || !userDetails.name) && userId && userId !== 'N/A') {
+                    try {
+                         if (Number(userId) > 0 || (typeof userId === 'string' && userId.length > 0)) {
+                             const fetchedUser = await UserService.getUserById(userId);
+                             if (fetchedUser && fetchedUser.name !== 'N/A') {
+                                 userDetails = fetchedUser;
+                             } else {
+                                userDetails = { ...fetchedUser, id: userId, name: `User ${String(userId).substring(0, 8)}...` };
+                             }
+                         }
+                    } catch (e) {
+                         console.warn('Failed to fetch user for transaction', item.id, e);
+                         userDetails = { id: userId, name: `ID: ${String(userId).substring(0, 8)}...` };
+                    }
+                } else if (!userDetails) {
+                    userDetails = { name: 'N/A' };
+                }
+
+                const amount = formatCurrency(item.amount);
+                const fee = formatCurrency(item.fee || 0); // Assuming fee might come from backend
+
+                return {
                     ...item,
                     userId: userId,
                     poolId: item.pool_id || item.poolId,
-                    amount: formatCurrency(item.amount),
-                    fee: formatCurrency(item.fee || 0),
-                    net: formatCurrency(item.amount) - formatCurrency(item.fee || 0),
-                    currency: item.currency || 'USD',
-                    status: item.status,
+                    amount: amount,
+                    fee: fee,
+                    net: amount - fee, // Calculate net if not provided
+                    currency: item.currency || 'USD', // Default if missing
+                    status: item.status, 
                     type: item.type || item.transaction_type || 'Unknown',
                     txHash: item.tx_hash || item.hask,
                     toAddress: item.to_address,
                     date: formatDate(item.created_at || item.createdAt || item.date).toISOString(),
+                    // Ensure ID is string
                     id: item.id || item.transaction_id,
                     user: userDetails
                 };
             });
 
-            // Identify users that need fetching
-            const usersToFetch = initialMappedData
-                .filter((item: any) => item.user._needsFetch)
-                .map((item: any) => item.userId);
-            
-            // Deduplicate IDs
-            const uniqueUserIds = [...new Set(usersToFetch)] as string[];
+            const mappedData = await Promise.all(mappedDataPromises);
 
-            // Fetch users with concurrency limit (e.g., 3 at a time)
-            if (uniqueUserIds.length > 0) {
-                const fetchUser = async (id: string) => {
-                    try {
-                        if (Number(id) > 0 || (typeof id === 'string' && id.length > 0)) {
-                            return await UserService.getUserById(id);
-                        }
-                    } catch (e) { /* ignore */ }
-                    return null;
-                };
+            const total = responseData.total || 0;
+            const currentLimit = responseData.limit || limit;
+            const calculatedTotalPages = currentLimit > 0 ? Math.ceil(total / currentLimit) : 0;
+            const totalPages = responseData.totalPages || calculatedTotalPages;
 
-                // Execute in batches of 3
-                const batchSize = 3;
-                for (let i = 0; i < uniqueUserIds.length; i += batchSize) {
-                    const batch = uniqueUserIds.slice(i, i + batchSize);
-                    await Promise.all(batch.map(fetchUser)); // UserService caches the result
-                }
-            }
-            
-            // Re-map with fetched user data (from cache)
-            const finalMappedData = await Promise.all(initialMappedData.map(async (item: any) => {
-                if (item.user._needsFetch) {
-                    try {
-                        const user = await UserService.getUserById(item.userId);
-                        return { ...item, user: user.name && user.name !== 'N/A' ? user : { ...user, name: `User ${String(item.userId).substring(0, 8)}...` } };
-                    } catch {
-                        return { ...item, user: { id: item.userId, name: `ID: ${String(item.userId).substring(0, 8)}...` } };
-                    }
-                }
-                return item;
-            }));
-
-            let currentPage = Number(responseData.page) || page;
-            let currentLimit = Number(responseData.limit) || limit;
-            let currentTotal = Number(responseData.total);
-            let totalPages = Number(responseData.totalPages);
-
-            // Correct handling for unknown total:
-            // If backend provides 0 total but we have data, we try to fetch from stats
-            // We shouldn't fake a growing total, but we can try to get a better total.
-            // But since filtering might be active, stats total might be too high.
-            // For now, let's keep the user request: "load total pages"
-            
-            // If totalPages is missing, let's try to get it from statistics endpoint ONLY IF NO SEARCH params are active
-            // Because statistics usually returns global total.
-            if ((!currentTotal || currentTotal === 0) && finalMappedData.length > 0 && !search) {
-                 try {
-                     const statsResponse = await api.get<any>('/transactions/statistics');
-                     // Assuming stats returns { total_transactions: number } or similar
-                     const statsData = statsResponse.data.data || statsResponse.data;
-                     
-                     // Flexible stats parsing (total_transactions, total, count, totalTransactions)
-                     const possibleTotal = Number(statsData.total_transactions) || Number(statsData.totalTransactions) || Number(statsData.total) || Number(statsData.count);
-                     
-                     if (possibleTotal > 0) {
-                         currentTotal = possibleTotal;
-                         totalPages = Math.ceil(currentTotal / currentLimit);
-                     }
-                 } catch (e) {
-                     console.warn('Failed to fetch transaction stats for total count');
-                 }
-            } else if (!currentTotal && finalMappedData.length > 0) {
-                 // Unknown total and maybe search active
-                 currentTotal = 0; 
-                 totalPages = 0; 
-            }
-
-            setData(finalMappedData);
+            setData(mappedData);
             setPagination({
-                page: currentPage,
-                limit: currentLimit,
-                total: currentTotal,
-                totalPages: totalPages
+                page: Number(responseData.page) || page,
+                limit: Number(currentLimit) || limit,
+                total: Number(total),
+                totalPages: Number(totalPages)
             });
 
         } catch (err: any) {
