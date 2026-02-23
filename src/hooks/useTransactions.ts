@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import api from '@/services/api';
-import type { Transaction, TransactionResponse } from '@/types/transactions'; 
+import type { Transaction } from '@/types/transactions'; 
 import { UserService } from '@/services/userService';
 
 // Helper to format invalid dates
@@ -15,23 +15,6 @@ const formatCurrency = (amount: any) => {
     return isNaN(num) ? 0 : num;
 }
 
-export const useTransactions = (initialPoolId?: string) => {
-    const [data, setData] = useState<Transaction[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        total: 0,
-        totalPages: 0
-    });
-
-    const fetchTransactions = useCallback(async (params: { page?: number; limit?: number; search?: string; poolId?: string } = {}) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const { page = 1, limit = 10, search = '', poolId = initialPoolId } = params;
-            
 // Helper to batch promises
 const batchPromises = async <T>(items: any[], batchSize: number, fn: (item: any) => Promise<T>): Promise<T[]> => {
     const results: T[] = [];
