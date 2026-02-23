@@ -124,19 +124,33 @@ export const useTransactions = (initialPoolId?: string) => {
                 };
             });
 
+            // Robust pagination data handling
             const mappedData = await Promise.all(mappedDataPromises);
 
-            const total = responseData.total || 0;
-            const currentLimit = responseData.limit || limit;
-            const calculatedTotalPages = currentLimit > 0 ? Math.ceil(total / currentLimit) : 0;
-            const totalPages = responseData.totalPages || calculatedTotalPages;
+            let currentPage = Number(responseData.page) || page;
+            let currentLimit = Number(responseData.limit) || limit;
+            let currentTotal = Number(responseData.total);
+
+            // If backend doesn't return total, try to infer reasonable defaults
+            if (isNaN(currentTotal) || currentTotal === 0) {
+                if (mappedData.length >= currentLimit) {
+                    // If page is full, assume there's at least one more item
+                    currentTotal = (currentPage * currentLimit) + 1;
+                } else {
+                    // If page is not full, this is the last page
+                    currentTotal = ((currentPage - 1) * currentLimit) + mappedData.length;
+                }
+            }
+
+            const calculatedTotalPages = currentLimit > 0 ? Math.ceil(currentTotal / currentLimit) : 0;
+            const totalPages = Number(responseData.totalPages) || calculatedTotalPages;
 
             setData(mappedData);
             setPagination({
-                page: Number(responseData.page) || page,
-                limit: Number(currentLimit) || limit,
-                total: Number(total),
-                totalPages: Number(totalPages)
+                page: currentPage,
+                limit: currentLimit,
+                total: currentTotal,
+                totalPages: totalPages
             });
 
         } catch (err: any) {
