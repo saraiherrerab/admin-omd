@@ -41,7 +41,15 @@ export const Sidebar = ({
             title: 'sidebar.poolUSDT',
             icon: <Database className="text-blue-500" />,
             path: '/poolUSDT',
-            children: []
+            children: [
+                { title: 'sidebar.dashboard', path: '/dashboard/poolUSDT' },
+                { title: 'sidebar.users', path: '/dashboard/poolUSDT/users' },
+                { title: 'sidebar.coupons', path: '/dashboard/poolUSDT/coupons' },
+                { title: 'sidebar.investments', path: '/dashboard/poolUSDT/investments' },
+                { title: 'sidebar.transactions', path: '/dashboard/poolUSDT/transactions' },
+                { title: 'sidebar.wallets', path: '/dashboard/poolUSDT/wallets' },
+                { title: 'sidebar.audits', path: '/dashboard/poolUSDT/audits' },
+            ]
         },
         {
             title: 'sidebar.poolOMDB',

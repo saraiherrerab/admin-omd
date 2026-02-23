@@ -339,5 +339,31 @@
       "cpu": "CPU",
       "memory": "Memoria"
     }
+  },
+  "transactions": {
+    "title": "Gestión de Transacciones",
+    "subtitle": "Crear y gestionar transacciones del sistema",
+    "newTransaction": "Nueva Transacción",
+    "totalTransactions": "Total Transacciones",
+    "completed": "Completadas",
+    "pending": "Pendientes",
+    "failed": "Fallidas",
+    "searchPlaceholder": "Buscar por usuario...",
+    "type": "Tipo de Transacción",
+    "status": "Estado",
+    "allTypes": "Todos los tipos",
+    "allStatuses": "Todos los estados",
+    "table": {
+      "id": "ID",
+      "user": "Usuario",
+      "type": "Tipo",
+      "amount": "Monto",
+      "fee": "Fee",
+      "net": "Neto",
+      "status": "Estado",
+      "date": "Fecha",
+      "actions": "Acciones",
+      "details": "Detalles"
+    }
   }
 }

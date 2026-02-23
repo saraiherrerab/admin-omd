@@ -16,19 +16,25 @@
     "language": "Language",
     "accept": "Accept",
     "decline": "Decline",
+    "notFound": "Data not found",
     "generateCode": "Generate code",
-    "notFound": "Not Found",
+    "messages": {
+      "createSuccess": "Created successfully",
+      "updateSuccess": "Updated successfully",
+      "deleteSuccess": "Deleted successfully"
+    },
     "labels": {
       "name": "Name",
       "description": "Description",
       "status_active": "Active",
       "status_inactive": "Inactive",
-      "classification": "Classification",
+      "hierarchy": "Hierarchy",
       "permissions": "Permissions",
+      "classification": "Classification",
       "created": "Created",
       "manage_permissions": "Manage Permissions",
       "actions": "Actions",
-      "state": "Status",
+      "state": "State",
       "edit": "Edit",
       "delete": "Delete",
       "create": "Create",
@@ -43,9 +49,14 @@
       "changeStatus": "Change Status",
       "balance": "Balance",
       "allRoles": "All Roles",
-      "assign": "Assign role",
+      "assign": "Assign Role",
+      "username": "Username",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "roles": "Roles",
+      "status": "Status",
       "user": "User",
-      "noPermissions": "You don't have permissions to perform this action",
+      "noPermissions": "You do not have permissions to perform this action",
       "yes": "Yes",
       "no": "No"
     },
@@ -68,10 +79,10 @@
     "signUp": "Sign Up",
     "email": "Email",
     "password": "Password",
-    "confirmPassword": "Confirm Password",
+    "confirmPassword": "Confirm password",
     "name": "Name",
-    "rememberMe": "Remember Me",
-    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "loginWithGoogle": "Login with Google",
@@ -82,7 +93,7 @@
     "passwordPlaceholder": "Enter your password",
     "namePlaceholder": "Enter your name",
     "loginTitle": "Welcome back",
-    "loginSubtitle": "Log in to your account",
+    "loginSubtitle": "Login to your account",
     "registerTitle": "Create Account",
     "registerSubtitle": "Sign up to get started",
     "authorizedPersonnelOnly": "Authorized personnel only",
@@ -95,7 +106,7 @@
     "totalUsers": "Total Users",
     "activeSessions": "Active Sessions",
     "settings": "Settings",
-    "config": "Configuration",
+    "config": "Settings",
     "userGrowth": "+20.1% from last month",
     "sessionGrowth": "+201 since last hour",
     "systemStatus": "System operating normally"
@@ -198,104 +209,59 @@
       "user_manager": {
         "name": "User Manager",
         "hierarchy": "Manager"
-      },
-      "wallet_manager": {
-        "name": "Wallet Manager",
-        "hierarchy": "Manager"
-      },
-      "auditor": {
-        "name": "Auditor",
-        "hierarchy": "Support"
-      },
-      "support": {
-        "name": "Support",
-        "hierarchy": "Support"
       }
     }
   },
-  "permissions": {
-    "title": "Permission Management",
-    "subtitle": "System Permissions",
-    "permissionManagement": "Permission Management",
-    "permissionManagementSubtitle": "System Permissions",
-    "noPermissionsFound": "No permissions found.",
-    "selectClassification": "Select Classification",
-    "createPermission": "Create Permission",
-    "editPermission": "Edit Permission",
-    "permissionDetails": "Permission Details"
-  },
-  "audits": {
-    "title": "Audit Management",
-    "subtitle": "System Audits",
-    "auditManagement": "Audit Management",
-    "auditManagementSubtitle": "System Audits",
-    "noAuditsFound": "No audits found."
-  },
   "coupons": {
     "title": "Coupon Management",
-    "subtitle": "Create and manage discount coupons",
+    "subtitle": "Create and manage system coupons",
+    "create": "Create New Coupon",
+    "delete": "Delete Coupon",
     "noCouponsFound": "No coupons found.",
-    "createCoupon": "Create Coupon",
-    "editCoupon": "Edit Coupon",
-    "couponDetails": "Coupon Details",
-    "code": "Code",
-    "status": "Status",
-    "amount": "Amount",
-    "pool": "Pool",
-    "creator": "Creator",
-    "assigned_user": "Assigned user",
-    "is_redeemed": "Redeemed",
-    "redeemed_at": "Redeemed at",
-    "expiration_date": "Expiration date",
-    "created_at": "Created at",
-    "updated_at": "Updated at",
-    "updated_by": "Updated by",
-    "created_by": "Created by",
-    "token": "Token",
+    "list": "List of all active and expired coupons",
     "confirmDelete": "Are you sure you want to delete this coupon?",
-    "filters": {
-      "all": "All",
-      "active": "Active",
-      "promo": "PROMO",
-      "used": "Used",
-      "expiredAfter": "Expired after",
-      "expiredBefore": "Expired before",
-      "createdAfter": "Created after",
-      "createdBefore": "Created before",
-      "minAmount": "Minimum amount",
-      "maxAmount": "Maximum amount",
+    "table": {
       "code": "Code",
-      "assignedTo": "Assigned to",
-      "redeemedBy": "Redeemed by",
-      "redeemed": "Redeemed",
-      "notRedeemed": "Not redeemed",
-      "creator": "Creator",
-      "pool": "Pool",
-      "returnable": "With return",
-      "notReturnable": "Without return",
-      "created_date": "Created date"
-    },
-    "headers": {
-      "code": "Code",
-      "amount": "Amount",
+      "type": "Type",
+      "value": "Value",
       "status": "Status",
-      "expiration_date": "Expiration date",
-      "redeemed_by": "Assigned to",
-      "with_return": "With return",
+      "actions": "Actions",
+      "expiration": "Expiration",
+      "assignedTo": "Assigned To",
+      "withReturn": "Return",
       "creator": "Creator",
-      "pool": "Pool"
+      "pool": "Pool",
+      "token": "Token"
     },
-    "labels": {
-      "amount": "Amount",
-      "code": "Code",
-      "expirationRange": "Expiration range",
-      "expirationMin": "Expiration min",
-      "expirationMax": "Expiration max",
+    "types": {
+      "all": "All types",
+      "FIXED": "Fixed Amount",
+      "PERCENTAGE": "Percentage"
+    },
+    "status": {
+      "all": "All statuses",
+      "ACTIVE": "Active",
+      "REDEEMED": "Redeemed",
+      "EXPIRED": "Expired"
+    },
+    "form": {
+      "code": "Coupon Code",
+      "type": "Coupon Type",
+      "value": "Value",
+      "expiration": "Expiration (Max 1 Year)",
+      "assignedTo": "Assign to (User ID or 'GLOBAL')",
+      "withReturn": "Investment with Return",
+      "selectType": "Select Type",
+      "selectPool": "Select Pool",
+      "selectToken": "Select Token",
+      "submit": "Create Coupon",
+      "advancedOptions": "Advanced Options",
+      "expirationMax": "Active Until",
       "redeemed_by": "Assigned to",
       "with_return": "With return",
       "creator": "Creator",
       "pool": "Pool",
-      "token": "Currency"
+      "token": "Coin"
     }
   },
   "workers": {
@@ -307,8 +273,8 @@
       "systemStatus": "System Status",
       "active": "ALL SYSTEMS ACTIVE",
       "inactive": "SYSTEMS PARTIALLY ACTIVE",
-      "turnAllOn": "Turn All ON",
-      "turnAllOff": "Turn All OFF"
+      "turnAllOn": "Turn All On",
+      "turnAllOff": "Turn All Off"
     },
     "stats": {
       "activeWorkers": "Active Workers",
@@ -331,6 +297,32 @@
       "title": "System Load (Last 24h)",
       "cpu": "CPU",
       "memory": "Memory"
+    }
+  },
+  "transactions": {
+    "title": "Transaction Management",
+    "subtitle": "Create and manage system transactions",
+    "newTransaction": "New Transaction",
+    "totalTransactions": "Total Transactions",
+    "completed": "Completed",
+    "pending": "Pending",
+    "failed": "Failed",
+    "searchPlaceholder": "Search by user...",
+    "type": "Transaction Type",
+    "status": "Status",
+    "allTypes": "All types",
+    "allStatuses": "All statuses",
+    "table": {
+      "id": "ID",
+      "user": "User",
+      "type": "Type",
+      "amount": "Amount",
+      "fee": "Fee",
+      "net": "Net",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions",
+      "details": "Details"
     }
   }
 }

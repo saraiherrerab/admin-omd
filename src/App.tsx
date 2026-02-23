@@ -7,6 +7,7 @@ import { RolesAndPermissions } from './pages/Principal/RolesAndPermissions'
 import { Coupons } from './pages/Principal/Coupons'
 import { PoolClosures } from './pages/Principal/PoolClosures'
 import { Workers } from '@/pages/Principal/Workers'
+import { Transactions as PoolUSDTTransactions } from '@/pages/PoolUSDT/Transactions'
 
 function App() {
   return (
@@ -36,6 +37,10 @@ function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard/poolOMDB/workers" element={<Workers />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard/poolUSDT/transactions" element={<PoolUSDTTransactions />} />
       </Route>
 
       {/* Catch all */}
