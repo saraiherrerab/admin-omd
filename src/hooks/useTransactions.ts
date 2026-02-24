@@ -38,11 +38,56 @@ export const useTransactions = (initialPoolId?: string) => {
         hasNextPage: false
     });
 
+    const [stats, setStats] = useState({
+        total: 0,
+        completed: 0,
+        pending: 0,
+        failed: 0,
+        totalAmount: 0
+    });
+
+    const fetchStats = useCallback(async (poolId?: string) => {
+        try {
+            const mapPoolId = (id?: string) => {
+                switch(id?.toUpperCase()) {
+                    case 'USDT': return 'POOL_USDT';
+                    case 'OMD':
+                    case 'OMD3': return 'POOL_OMD';
+                    case 'OMDB': return 'POOL_OMDB';
+                    default: return undefined;
+                }
+            };
+            const backendPoolId = mapPoolId(poolId || initialPoolId);
+            const queryParams = new URLSearchParams();
+            if (backendPoolId) queryParams.append('pool_id', backendPoolId);
+
+            const response = await api.get(`/transactions/statistics?${queryParams.toString()}`);
+            if (response.data?.success) {
+                // Map backend stats to frontend structure
+                // Assuming backend returns { total: X, status_counts: { COMPLETED: Y, ... } } or similar
+                // If structure is unknown, we map nicely
+                const raw = response.data.data || {};
+                setStats({
+                    total: raw.total || 0,
+                    completed: raw.completed || raw.status_counts?.COMPLETED || 0,
+                    pending: raw.pending || raw.status_counts?.PENDING || 0,
+                    failed: raw.failed || raw.status_counts?.FAILED || 0,
+                    totalAmount: raw.total_amount || 0
+                });
+            }
+        } catch (e) {
+            console.error("Failed to fetch transaction stats", e);
+        }
+    }, [initialPoolId]);
+
     const fetchTransactions = useCallback(async (params: { page?: number; limit?: number; search?: string; poolId?: string } = {}) => {
         setLoading(true);
         setError(null);
         try {
             const { page = 1, limit = 10, search = '', poolId = initialPoolId } = params;
+            
+            // Fetch stats in parallel if first page
+            if (page === 1) fetchStats(poolId);
             
             // ... (mapping poolId logic remains) ...
             const mapPoolId = (id?: string) => {
@@ -177,10 +222,12 @@ export const useTransactions = (initialPoolId?: string) => {
 
     return {
         transactions: data,
+        stats,
         loading,
         error,
         pagination,
         fetchTransactions,
+        fetchStats,
         getTransactionById
     };
 };

@@ -17,6 +17,13 @@ const formatCurrency = (amount: any) => {
 
 export const useInvestments = (initialPoolId?: string) => {
     const [data, setData] = useState<Investment[]>([]);
+    const [stats, setStats] = useState({
+        totalInvested: 0,
+        totalReturn: 0,
+        activeCount: 0,
+        totalCount: 0,
+        avgRate: 0
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [pagination, setPagination] = useState({
@@ -26,11 +33,46 @@ export const useInvestments = (initialPoolId?: string) => {
         totalPages: 0
     });
 
+    const fetchStats = useCallback(async (poolId?: string) => {
+        try {
+             // Map frontend pool ID to backend enum - duplication I know but cleaner than extracting for now
+            const mapPoolId = (id?: string) => {
+                switch(id?.toUpperCase()) {
+                    case 'USDT': return 'POOL_USDT';
+                    case 'OMD':
+                    case 'OMD3': return 'POOL_OMD';
+                    case 'OMDB': return 'POOL_OMDB';
+                    default: return undefined;
+                }
+            };
+            const backendPoolId = mapPoolId(poolId || initialPoolId);
+            const queryParams = new URLSearchParams();
+            if (backendPoolId) queryParams.append('pool_id', backendPoolId);
+
+            const response = await api.get(`/investments/statistics?${queryParams.toString()}`);
+            if (response.data && response.data.success) {
+                const raw = response.data.data;
+                setStats({
+                    totalInvested: raw.total_invested || 0,
+                    totalReturn: raw.total_return || 0,
+                    activeCount: raw.active_investments || 0,
+                    totalCount: raw.total_investments || 0,
+                    avgRate: raw.average_rate || 0
+                });
+            }
+        } catch (e) {
+            console.error("Failed to fetch investment stats", e);
+        }
+    }, [initialPoolId]);
+
+
     const fetchInvestments = useCallback(async (params: { page?: number; limit?: number; search?: string; poolId?: string } = {}) => {
         setLoading(true);
         setError(null);
         try {
             const { page = 1, limit = 10, search = '', poolId = initialPoolId } = params;
+            
+            if (page === 1) fetchStats(poolId);
             
             // Map frontend pool ID to backend enum
             const mapPoolId = (id?: string) => {
@@ -162,10 +204,12 @@ export const useInvestments = (initialPoolId?: string) => {
 
     return {
         investments: data,
+        stats,
         loading,
         error,
         pagination,
         fetchInvestments,
+        fetchStats,
         getInvestmentById,
         createInvestment
     };

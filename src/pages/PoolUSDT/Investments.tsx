@@ -39,6 +39,7 @@ export const Investments = () => {
     // --- Data Fetching ---
     const { 
         investments, 
+        stats,
         loading, 
         pagination, 
         fetchInvestments 
@@ -121,24 +122,24 @@ export const Investments = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-2">
                     <StatCard
                         label="Total Invertido"
-                        value="$620,000"
+                        value={`$${stats?.totalInvested?.toLocaleString() || '0'}`}
                         change="+12.5% este mes"
                         isPositive={true}
                     />
                     <StatCard
                         label="Retorno Total"
-                        value="$61,560"
+                        value={`$${stats?.totalReturn?.toLocaleString() || '0'}`}
                         change="+8.3% este mes"
                         isPositive={true}
                     />
                     <StatCard
                         label="Inversiones Activas"
-                        value="5"
-                        subValue="de 8 totales"
+                        value={`${stats?.activeCount || 0}`}
+                        subValue={`de ${stats?.totalCount || 0} totales`}
                     />
                     <StatCard
                         label="Tasa Promedio"
-                        value="9.4%"
+                        value={`${stats?.avgRate || 0}%`}
                         change="+2.1% este mes"
                         isPositive={true}
                     />

@@ -42,6 +42,7 @@ export const Transactions = () => {
     // --- Data Fetching ---
     const { 
         transactions, 
+        stats, // Add stats here
         loading, 
         pagination, 
         fetchTransactions 
@@ -146,7 +147,7 @@ export const Transactions = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-muted-foreground">Total Transacciones</p>
-                                    <h2 className="text-xl font-bold mt-1">1,482</h2>
+                                    <h2 className="text-xl font-bold mt-1">{stats?.total?.toLocaleString() || 0}</h2>
                                 </div>
                                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
                                     <Wallet className="h-5 w-5" />
@@ -167,7 +168,7 @@ export const Transactions = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-muted-foreground">Completadas</p>
-                                    <h2 className="text-xl font-bold mt-1">1,250</h2>
+                                    <h2 className="text-xl font-bold mt-1">{stats?.completed?.toLocaleString() || 0}</h2>
                                 </div>
                                 <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
                                     <CheckCircle2 className="h-5 w-5" />
@@ -175,9 +176,9 @@ export const Transactions = () => {
                             </div>
                             <div className="mt-4">
                                 <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                                    <div className="h-full bg-emerald-500 w-[85%]" />
+                                    <div className="h-full bg-emerald-500" style={{ width: `${stats.total > 0 ? (stats.completed / stats.total) * 100 : 0}%` }} />
                                 </div>
-                                <p className="text-[10px] font-semibold text-muted-foreground mt-1.5">85% tasa de éxito</p>
+                                <p className="text-[10px] font-semibold text-muted-foreground mt-1.5">{stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}% tasa de éxito</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -188,7 +189,7 @@ export const Transactions = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-muted-foreground">Pendientes</p>
-                                    <h2 className="text-xl font-bold mt-1">185</h2>
+                                    <h2 className="text-xl font-bold mt-1">{stats?.pending?.toLocaleString() || 0}</h2>
                                 </div>
                                 <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
                                     <Clock className="h-5 w-5" />
@@ -208,7 +209,7 @@ export const Transactions = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-xs text-muted-foreground">Fallidas</p>
-                                    <h2 className="text-xl font-bold mt-1">47</h2>
+                                    <h2 className="text-xl font-bold mt-1">{stats?.failed?.toLocaleString() || 0}</h2>
                                 </div>
                                 <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
                                     <XCircle className="h-5 w-5" />
